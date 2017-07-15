@@ -3,13 +3,16 @@ import re
 import os
 
 class Calc:
-	version = 1.0
-	pattern_start = r'^([0-9\+\*/-]+)$'
-	pattern_result = r'^([0-9]+)$'
+	version = 1.1
+	pattern_start = r'^([0-9\+\*/\^(\sroot\s)-]+)$'
+	pattern_result = r'^([0-9]+)(\.[0-9]+)?$'
 	pattern1 = r'([0-9]+)[\*/]([0-9]+)'
-	pattern2 = r'([0-9+])[\+-]([0-9]+)'
+	pattern2 = r'([0-9]+)[\+-]([0-9]+)'
+	pattern3 = r'([0-9]+)(\^|\sroot\s)([0-9]+)'
+	accuracy = 2 # Set default accuracy
 	
 	def __init__(self):
+		self.read_settings()
 		self.start()
 		
 	def start(self):
@@ -28,16 +31,36 @@ class Calc:
 	def analysis(self, command):
 		calculation1 = re.search(self.pattern1, command)
 		calculation2 = re.search(self.pattern2, command)
-		if calculation1:
+		calculation3 = re.search(self.pattern3, command)
+		if calculation3:
+			calculation = calculation3.group()
+			symbol = calculation.find('^')
+			if symbol != -1:
+				elements = map(float, calculation.split('^'))
+				result2 = elements[0]**elements[1]
+			else:
+				symbol = calculation.find(' root ')
+				if symbol != -1:
+					elements = map(float, calculation.split(' root '))
+					result2 = round(elements[1]**(1/float(elements[0])), 2)
+				else:
+					print(u"Błąd: niezindentyfikowane działanie")
+			command = command.replace(calculation, str(result2))
+			if re.search(self.pattern_result, command) == None:
+				print(command)
+				self.analysis(command)
+			else:
+				self.print_result(command)
+		elif calculation1:
 			calculation = calculation1.group()
 			symbol = calculation.find('*')
 			if symbol != -1:
-				elements = map(int, calculation.split('*'))
+				elements = map(float, calculation.split('*'))
 				result2 = elements[0]*elements[1]
 			else:
 				symbol = calculation.find('/')
 				if symbol != -1:
-					elements = map(int, calculation.split('/'))
+					elements = map(float, calculation.split('/'))
 					if elements[1] != 0:
 						result2 = elements[0]/elements[1]
 					else:
@@ -45,26 +68,30 @@ class Calc:
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
 			command = command.replace(calculation, str(result2))
-			print(command)
 			if re.search(self.pattern_result, command) == None:
+				print(command)
 				self.analysis(command)
+			else:
+				self.print_result(command)
 		elif calculation2:
 			calculation = calculation2.group()
 			symbol = calculation.find('+')
 			if symbol != -1:
-				elements = map(int, calculation.split('+'))
+				elements = map(float, calculation.split('+'))
 				result2 = elements[0]+elements[1]
 			else:
 				symbol = calculation.find('-')
 				if symbol != -1:
-					elements = map(int, calculation.split('-'))
+					elements = map(float, calculation.split('-'))
 					result2 = elements[0]-elements[1]
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
 			command = command.replace(calculation, str(result2))
-			print(command)
 			if re.search(self.pattern_result, command) == None:
+				print(command)
 				self.analysis(command)
+			else:
+				self.print_result(command)
 		else:
 			print(u"Niepoprawne działanie")
 	
@@ -73,5 +100,19 @@ class Calc:
 			os.system('cls')
 		else:
 			os.system('clear')
-	
+			
+	def read_settings(self):
+		if os.path.isfile('config.dat'):
+			config = open("config.dat", "r")
+			self.accuracy = int(config.readline().split(': ')[1])
+		else:
+			print(u"Nie znaleziono pliku ustawień")
+			
+	def print_result(self, result):
+		result = float(result)
+		if result.is_integer():
+			print(str(int(result)))
+		else:
+			print(str(round(result, self.accuracy)))
+			
 kalkulator = Calc()
