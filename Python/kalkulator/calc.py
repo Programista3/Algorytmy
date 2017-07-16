@@ -3,7 +3,7 @@ import re
 import os
 
 class Calc:
-	version = 1.2
+	version = '1.2.1'
 	pattern_start = r'^([0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
 	pattern_result = r'^([0-9]+)(\.[0-9]+)?$'
 	pattern1 = r'([0-9]+(\.[0-9]+)?)[\*/]([0-9]+(\.[0-9]+)?)'
@@ -25,7 +25,6 @@ class Calc:
 				self.Clear()
 			else:
 				if re.search(self.pattern_start, command):
-					print(command+" =")
 					self.analysis(command)
 				else:
 					print(u"Użyto niedozwolonych znaków")
@@ -47,6 +46,7 @@ class Calc:
 					result2 = round(elements[1]**(1/float(elements[0])), 2)
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
+					return False, False
 			return calculation, result2
 		elif calculation1:
 			calculation = calculation1.group()
@@ -62,8 +62,10 @@ class Calc:
 						result2 = elements[0]/elements[1]
 					else:
 						print(u"Nie można dzielić przez 0")
+						return False, False
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
+					return False, False
 			return calculation, result2
 		elif calculation2:
 			calculation = calculation2.group()
@@ -78,9 +80,11 @@ class Calc:
 					result2 = elements[0]-elements[1]
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
+					return False, False
 			return calculation, result2
 		else:
 			print(u"Niepoprawne działanie")
+			return False, False
 		
 	def analysis(self, command):
 		calculation = re.search(self.pattern4, command)
@@ -88,7 +92,7 @@ class Calc:
 			calculation = calculation.group()
 			calculation.replace('(', '').replace(')', '')
 			calculation2, result = self.calculate(calculation)
-			if result:
+			if calculation != False:
 				command = command.replace(calculation, str(result))
 				if re.search(self.pattern_result, command) == None:
 					print(command+" =")
@@ -97,7 +101,7 @@ class Calc:
 					self.print_result(command)
 		else:
 			calculation2, result = self.calculate(command)
-			if result:
+			if calculation != False:
 				command = command.replace(calculation2, str(result))
 				if re.search(self.pattern_result, command) == None:
 					print(command+" =")
