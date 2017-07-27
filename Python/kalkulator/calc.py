@@ -3,12 +3,12 @@ import re
 import os
 
 class Calc:
-	version = '1.2.1'
+	version = '1.3'
 	pattern_start = r'^([0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
-	pattern_result = r'^([0-9]+)(\.[0-9]+)?$'
-	pattern1 = r'([0-9]+(\.[0-9]+)?)[\*/]([0-9]+(\.[0-9]+)?)'
-	pattern2 = r'([0-9]+(\.[0-9]+)?)[\+-]([0-9]+(\.[0-9]+)?)'
-	pattern3 = r'([0-9]+(\.[0-9]+)?)(\^|\sroot\s)([0-9]+(\.[0-9]+)?)'
+	pattern_result = r'^[+-]?[0-9]+(\.[0-9]+)?$'
+	pattern1 = r'[+-]?[0-9]+(\.[0-9]+)?[\*/][+-]?[0-9]+(\.[0-9]+)?'
+	pattern2 = r'[+-]?[0-9]+(\.[0-9]+)?[+-][+-]?[0-9]+(\.[0-9]+)?'
+	pattern3 = r'[+-]?[0-9]+(\.[0-9]+)?(\^|root)[+-]?[0-9]+(\.[0-9]+)?'
 	pattern4 = r'\(((?![\(\)]).)+\)'
 	accuracy = 2 # Set default accuracy
 	
@@ -22,7 +22,9 @@ class Calc:
 			if command == 'exit':
 				break
 			elif command == 'clear':
-				self.Clear()
+				self.clear()
+			elif command == 'settings':
+				self.settings()
 			else:
 				if re.search(self.pattern_start, command):
 					self.analysis(command)
@@ -34,16 +36,23 @@ class Calc:
 		calculation2 = re.search(self.pattern2, command)
 		calculation3 = re.search(self.pattern3, command)
 		if calculation3:
-			calculation = calculation3.group()
+			calculation = calculation3.group().replace(" ", "")
 			symbol = calculation.find('^')
 			if symbol != -1:
 				elements = map(float, calculation.split('^'))
 				result2 = elements[0]**elements[1]
 			else:
-				symbol = calculation.find(' root ')
+				symbol = calculation.find('root')
 				if symbol != -1:
-					elements = map(float, calculation.split(' root '))
-					result2 = round(elements[1]**(1/float(elements[0])), 2)
+					elements = map(float, calculation.split('root'))
+					if elements[1] < 0:
+						if elements[0]%2 == 0:
+							print(u"Nie można obliczyć pierwiastka stopnia parzystego z liczby ujemnej!")
+							return False, False
+						else:
+							result2 = -(round((-elements[1])**(1/float(elements[0])), 2))
+					else:
+						result2 = round(elements[1]**(1/float(elements[0])), 2)
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
 					return False, False
@@ -74,25 +83,35 @@ class Calc:
 				elements = map(float, calculation.split('+'))
 				result2 = elements[0]+elements[1]
 			else:
-				symbol = calculation.find('-')
-				if symbol != -1:
-					elements = map(float, calculation.split('-'))
-					result2 = elements[0]-elements[1]
+				count = calculation.count('-')
+				minus = [result.start() for result in re.finditer('-', calculation)]
+				if count == 3:
+					index = 1
+				elif count == 2:
+					if calculation[0] == '-':
+						index = 1
+					else:
+						index = 0
+				elif count == 1:
+					index = 0
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
 					return False, False
+				elements = [float(calculation[:minus[index]]), float(calculation[len(calculation)-minus[index]:])]
+				result2 = elements[0]-elements[1]
 			return calculation, result2
 		else:
 			print(u"Niepoprawne działanie")
 			return False, False
 		
 	def analysis(self, command):
+		command = command.replace(" ", "")
 		calculation = re.search(self.pattern4, command)
 		if calculation:
 			calculation = calculation.group()
 			calculation.replace('(', '').replace(')', '')
 			calculation2, result = self.calculate(calculation)
-			if calculation != False:
+			if calculation2 != False:
 				command = command.replace(calculation, str(result))
 				if re.search(self.pattern_result, command) == None:
 					print(command+" =")
@@ -101,7 +120,7 @@ class Calc:
 					self.print_result(command)
 		else:
 			calculation2, result = self.calculate(command)
-			if calculation != False:
+			if calculation2 != False:
 				command = command.replace(calculation2, str(result))
 				if re.search(self.pattern_result, command) == None:
 					print(command+" =")
@@ -109,7 +128,7 @@ class Calc:
 				else:
 					self.print_result(command)
 	
-	def Clear(self):
+	def clear(self):
 		if os.name == 'nt':
 			os.system('cls')
 		else:
@@ -128,5 +147,24 @@ class Calc:
 			print(str(int(result)))
 		else:
 			print(str(round(result, self.accuracy)))
+	
+	def settings(self):
+		self.clear()
+		self.read_settings()
+		print(u"Wpisz nową wartość parametru lub pozostaw puste miejsce aby zachować aktualny wartość")
+		print(u"Dokładność("+str(self.accuracy)+"):"),
+		accuracy = raw_input()
+		if accuracy != "" and accuracy != self.accuracy:
+			if os.path.isfile('config.dat'):
+				config = open('config.dat', 'w')
+				config.truncate()
+				config.write('accuracy: '+str(accuracy))
+				config.close()
+				self.accuracy = accuracy
+				print(u"Zmiany zostały zapisane")
+			else:
+				print(u"Nie znaleziono pliku ustawień")
+		else:
+			print(u"Zmiany zostały zapisane")
 			
 kalkulator = Calc()
