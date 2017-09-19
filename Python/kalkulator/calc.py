@@ -3,14 +3,14 @@ import re
 import os
 
 class Calc:
-	version = '1.3'
+	version = '1.4'
 	pattern_start = r'^([0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
 	pattern_result = r'^[+-]?[0-9]+(\.[0-9]+)?$'
 	pattern1 = r'[+-]?[0-9]+(\.[0-9]+)?[\*/][+-]?[0-9]+(\.[0-9]+)?'
-	pattern2 = r'[+-]?[0-9]+(\.[0-9]+)?[+-][+-]?[0-9]+(\.[0-9]+)?'
+	pattern2 = r'([^0-9][+-]|^[+-])?[0-9]+(\.[0-9]+)?[+-][+-]?[0-9]+(\.[0-9]+)?'
 	pattern3 = r'[+-]?[0-9]+(\.[0-9]+)?(\^|root)[+-]?[0-9]+(\.[0-9]+)?'
 	pattern4 = r'\(((?![\(\)]).)+\)'
-	accuracy = 2 # Set default accuracy
+	accuracy = 6 # Set default accuracy
 	
 	def __init__(self):
 		self.read_settings()
@@ -50,9 +50,9 @@ class Calc:
 							print(u"Nie można obliczyć pierwiastka stopnia parzystego z liczby ujemnej!")
 							return False, False
 						else:
-							result2 = -(round((-elements[1])**(1/float(elements[0])), 2))
+							result2 = -(round((-elements[1])**(1/float(elements[0])), self.accuracy))
 					else:
-						result2 = round(elements[1]**(1/float(elements[0])), 2)
+						result2 = round(elements[1]**(1/float(elements[0])), self.accuracy)
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
 					return False, False
@@ -97,7 +97,7 @@ class Calc:
 				else:
 					print(u"Błąd: niezindentyfikowane działanie")
 					return False, False
-				elements = [float(calculation[:minus[index]]), float(calculation[len(calculation)-minus[index]:])]
+				elements = [float(calculation[:minus[index]]), float(calculation[minus[index]+1:])]
 				result2 = elements[0]-elements[1]
 			return calculation, result2
 		else:
@@ -112,7 +112,7 @@ class Calc:
 			calculation.replace('(', '').replace(')', '')
 			calculation2, result = self.calculate(calculation)
 			if calculation2 != False:
-				command = command.replace(calculation, str(result))
+				command = command.replace(calculation, str(self.format_result(result)))
 				if re.search(self.pattern_result, command) == None:
 					print(command+" =")
 					self.analysis(command)
@@ -121,7 +121,7 @@ class Calc:
 		else:
 			calculation2, result = self.calculate(command)
 			if calculation2 != False:
-				command = command.replace(calculation2, str(result))
+				command = command.replace(calculation2, str(self.format_result(result)))
 				if re.search(self.pattern_result, command) == None:
 					print(command+" =")
 					self.analysis(command)
@@ -141,12 +141,16 @@ class Calc:
 		else:
 			print(u"Nie znaleziono pliku ustawień")
 			
-	def print_result(self, result):
-		result = float(result)
-		if result.is_integer():
-			print(str(int(result)))
+	def format_result(self, number):
+		number = float(number)
+		if number.is_integer():
+			return int(number)
 		else:
-			print(str(round(result, self.accuracy)))
+			return round(number, self.accuracy)
+		
+	def print_result(self, result):
+		print(str(self.format_result(result)))
+		print(self.accuracy)
 	
 	def settings(self):
 		self.clear()
