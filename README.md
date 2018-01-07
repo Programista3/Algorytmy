@@ -1,3 +1,3 @@
 # Algorytmy
-Programy testowane w środowisku Windows 10 z wykorzystaniem Pythona 2.7.13<br/><br/>
-Grzegorz Babiarz 2017
+Programy testowane w środowisku Windows 10 z wykorzystaniem Pythona 3.6.3<br/><br/>
+Grzegorz Babiarz 2017-2018
