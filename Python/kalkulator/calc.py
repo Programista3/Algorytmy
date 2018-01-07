@@ -1,36 +1,80 @@
 # -*- coding: utf-8 -*-
 import re
 import os
+import tkinter.scrolledtext as tkst
+from tkinter import *
+import tkinter.ttk as ttk
+from tkinter import messagebox
 
 class Calc:
-	version = '1.4'
+	version = '2.0'
 	pattern_start = r'^([0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
-	pattern_result = r'^[+-]?[0-9]+(\.[0-9]+)?$'
-	pattern1 = r'[+-]?[0-9]+(\.[0-9]+)?[\*/][+-]?[0-9]+(\.[0-9]+)?'
-	pattern2 = r'([^0-9][+-]|^[+-])?[0-9]+(\.[0-9]+)?[+-][+-]?[0-9]+(\.[0-9]+)?'
-	pattern3 = r'[+-]?[0-9]+(\.[0-9]+)?(\^|root)[+-]?[0-9]+(\.[0-9]+)?'
+	pattern_result = r'^[-]?[0-9]+(\.[0-9]+)?$'
+	pattern1 = r'[-]?[0-9]+(\.[0-9]+)?[\*/][-]?[0-9]+(\.[0-9]+)?'
+	pattern2 = r'[-]?[0-9]+(\.[0-9]+)?[+-][-]?[0-9]+(\.[0-9]+)?'
+	pattern3 = r'[-]?[0-9]+(\.[0-9]+)?(\^|root)[-]?[0-9]+(\.[0-9]+)?'
 	pattern4 = r'\(((?![\(\)]).)+\)'
 	accuracy = 6 # Set default accuracy
 	
 	def __init__(self):
+		self.set_win = False
 		self.read_settings()
-		self.start()
+		self.start_gui()
 		
-	def start(self):
-		while True:
-			command = raw_input('Calc: ')
-			if command == 'exit':
-				break
-			elif command == 'clear':
-				self.clear()
-			elif command == 'settings':
-				self.settings()
+	def btnClick(self, e=None):
+		self.warning['text'] = ""
+		command = self.textbox.get()
+		if len(command) > 1:
+			if re.search(self.pattern_start, command):
+				self.textarea.delete(1.0, END)
+				self.textarea.insert(END, command)
+				self.analysis(command)
 			else:
-				if re.search(self.pattern_start, command):
-					self.analysis(command)
-				else:
-					print(u"Użyto niedozwolonych znaków")
-		
+				self.warning['text'] = "Użyto niedozwolonych znaków"
+		else:
+			self.warning['text'] = "Wpisz działanie!"
+
+	def clearText(self):
+		self.textbox.delete(0, END)
+		self.textarea.delete(1.0, END)		
+	
+	def clearTextbox(self, e=None):
+		self.textbox.delete(0, END)
+	
+	def showInfo(self):
+		messagebox.showinfo("Kalkulator - informacje", "Kalkulator v.2.0\nGrzegorz Babiarz 2017-2018\nGNU General Public License v3.0\nhttps://github.com/Programista3/Algorytmy/tree/master/Python/kalkulator")
+
+	def quit(self):
+		self.root.destroy()
+
+	def start_gui(self):
+		self.root = Tk()
+		self.root.geometry('{}x{}'.format(550, 250))
+		self.root.title("Kalkulator")
+		menu = Menu(self.root)
+		options = Menu(menu)
+		options.add_command(label="Ustawienia", command=self.settings)
+		options.add_command(label="Informacje", command=self.showInfo)
+		options.add_command(label="Wyjście", command=self.quit)
+		menu.add_cascade(label="Opcje", menu=options)
+		self.textbox = ttk.Entry(self.root, width=85)
+		self.textbox.bind("<Return>", self.btnClick)
+		self.textbox.bind("<Delete>", self.clearTextbox)
+		self.textbox.pack(pady=10)
+		self.textarea = tkst.ScrolledText(self.root, width=62, height=9)
+		self.textarea.pack()
+		self.warning = ttk.Label(self.root, text="")
+		self.warning.pack()
+		bottom = Frame(self.root)
+		bottom.pack()
+		clear = ttk.Button(self.root, command=self.clearText, text="Wyczyść")
+		clear.pack(in_=bottom, side=LEFT)
+		button = ttk.Button(self.root, command=self.btnClick, text='Oblicz')
+		button.pack(in_=bottom, padx=4, pady=4)
+		self.root.config(menu=menu)
+		self.root.resizable(0,0)
+		self.root.mainloop()
+
 	def calculate(self, command):
 		calculation1 = re.search(self.pattern1, command)
 		calculation2 = re.search(self.pattern2, command)
@@ -39,48 +83,48 @@ class Calc:
 			calculation = calculation3.group().replace(" ", "")
 			symbol = calculation.find('^')
 			if symbol != -1:
-				elements = map(float, calculation.split('^'))
+				elements = list(map(float, calculation.split('^')))
 				result2 = elements[0]**elements[1]
 			else:
 				symbol = calculation.find('root')
 				if symbol != -1:
-					elements = map(float, calculation.split('root'))
+					elements = list(map(float, calculation.split('root')))
 					if elements[1] < 0:
 						if elements[0]%2 == 0:
-							print(u"Nie można obliczyć pierwiastka stopnia parzystego z liczby ujemnej!")
+							self.warning['text'] = "Nie można obliczyć pierwiastka stopnia parzystego z liczby ujemnej!"
 							return False, False
 						else:
 							result2 = -(round((-elements[1])**(1/float(elements[0])), self.accuracy))
 					else:
 						result2 = round(elements[1]**(1/float(elements[0])), self.accuracy)
 				else:
-					print(u"Błąd: niezindentyfikowane działanie")
+					self.warning['text'] = "Błąd: niezindentyfikowane działanie"
 					return False, False
 			return calculation, result2
 		elif calculation1:
 			calculation = calculation1.group()
 			symbol = calculation.find('*')
 			if symbol != -1:
-				elements = map(float, calculation.split('*'))
+				elements = list(map(float, calculation.split('*')))
 				result2 = elements[0]*elements[1]
 			else:
 				symbol = calculation.find('/')
 				if symbol != -1:
-					elements = map(float, calculation.split('/'))
+					elements = list(map(float, calculation.split('/')))
 					if elements[1] != 0:
 						result2 = elements[0]/elements[1]
 					else:
-						print(u"Nie można dzielić przez 0")
+						self.warning['text'] = "Nie można dzielić przez 0"
 						return False, False
 				else:
-					print(u"Błąd: niezindentyfikowane działanie")
+					self.warning['text'] = "Błąd: niezindentyfikowane działanie"
 					return False, False
 			return calculation, result2
 		elif calculation2:
 			calculation = calculation2.group()
 			symbol = calculation.find('+')
 			if symbol != -1:
-				elements = map(float, calculation.split('+'))
+				elements = list(map(float, calculation.split('+')))
 				result2 = elements[0]+elements[1]
 			else:
 				count = calculation.count('-')
@@ -95,13 +139,13 @@ class Calc:
 				elif count == 1:
 					index = 0
 				else:
-					print(u"Błąd: niezindentyfikowane działanie")
+					self.warning['text'] = "Błąd: niezindentyfikowane działanie"
 					return False, False
 				elements = [float(calculation[:minus[index]]), float(calculation[minus[index]+1:])]
 				result2 = elements[0]-elements[1]
 			return calculation, result2
 		else:
-			print(u"Niepoprawne działanie")
+			self.warning['text'] = "Niepoprawne działanie"
 			return False, False
 		
 	def analysis(self, command):
@@ -114,32 +158,35 @@ class Calc:
 			if calculation2 != False:
 				command = command.replace(calculation, str(self.format_result(result)))
 				if re.search(self.pattern_result, command) == None:
-					print(command+" =")
+					self.textarea.insert(END, "="+command)
 					self.analysis(command)
 				else:
-					self.print_result(command)
+					self.textbox.delete()
+					self.textbox.insert(0, command)
+					self.textarea.insert(END, "="+command)
+			else:
+				self.textarea.delete(1.0, END)
 		else:
 			calculation2, result = self.calculate(command)
 			if calculation2 != False:
 				command = command.replace(calculation2, str(self.format_result(result)))
 				if re.search(self.pattern_result, command) == None:
-					print(command+" =")
+					self.textarea.insert(END, "="+command)
 					self.analysis(command)
 				else:
-					self.print_result(command)
-	
-	def clear(self):
-		if os.name == 'nt':
-			os.system('cls')
-		else:
-			os.system('clear')
+					self.textbox.delete(0, END)
+					self.textbox.insert(0, command)
+					self.textarea.insert(END, "="+command)
+			else:
+				self.textarea.delete(1.0, END)
 			
 	def read_settings(self):
 		if os.path.isfile('config.dat'):
-			config = open("config.dat", "r")
-			self.accuracy = int(config.readline().split(': ')[1])
-		else:
-			print(u"Nie znaleziono pliku ustawień")
+			config = open("config.dat", "r").read()
+			ac_pattern = r'accuracy: [0-9]+'
+			search = re.search(ac_pattern, config)
+			if search:
+				self.accuracy = int(search.group().split(': ')[1])
 			
 	def format_result(self, number):
 		number = float(number)
@@ -147,28 +194,41 @@ class Calc:
 			return int(number)
 		else:
 			return round(number, self.accuracy)
-		
-	def print_result(self, result):
-		print(str(self.format_result(result)))
-		print(self.accuracy)
 	
-	def settings(self):
-		self.clear()
-		self.read_settings()
-		print(u"Wpisz nową wartość parametru lub pozostaw puste miejsce aby zachować aktualny wartość")
-		print(u"Dokładność("+str(self.accuracy)+"):"),
-		accuracy = raw_input()
-		if accuracy != "" and accuracy != self.accuracy:
-			if os.path.isfile('config.dat'):
-				config = open('config.dat', 'w')
-				config.truncate()
-				config.write('accuracy: '+str(accuracy))
-				config.close()
-				self.accuracy = accuracy
-				print(u"Zmiany zostały zapisane")
-			else:
-				print(u"Nie znaleziono pliku ustawień")
+	def close(self):
+		self.window.destroy()
+		self.set_win = False
+
+	def save_settings(self):
+		if os.path.isfile("config.dat"):
+			config = open("config.dat", "w")
+			config.write(self.configText.get(1.0, END).strip())
 		else:
-			print(u"Zmiany zostały zapisane")
+			config = open("config.dat", "w+")
+			config.write(self.configText.get(1.0, END).strip())
+		messagebox.showinfo("Zapisywanie ustawień", "Zmiany zostały zapisane")
+		config.close()
+
+	def settings(self):
+		if not self.set_win:
+			self.set_win = True
+			self.window = Toplevel()
+			self.window.geometry("400x300")
+			self.window.wm_title("Zmień ustawienia")
+			self.configText = tkst.ScrolledText(self.window, width=50, height=16)
+			self.configText.pack()
+			if os.path.isfile("config.dat"):
+				config = open("config.dat", "r")
+				self.configText.insert(END, config.read())
+			else:
+				config = open("config.dat", "w+")
+				text = "accuracy: "+str(self.accuracy)
+				config.write(text)
+				self.configText.insert(END, text)
+			config.close()
+			btn = ttk.Button(self.window, text="Zapisz", command=self.save_settings)
+			btn.pack(pady=6)
+			self.window.resizable(0,0)
+			self.window.protocol("WM_DELETE_WINDOW", self.close)
 			
 kalkulator = Calc()
