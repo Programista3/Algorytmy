@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
 import re
 import os
+import math
 import tkinter.scrolledtext as tkst
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
 
 class Calc:
-	version = '2.0'
-	pattern_start = r'^([0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
+	version = '2.1'
+	pattern_start = r'^([a-z0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
 	pattern_result = r'^[-]?[0-9]+(\.[0-9]+)?$'
 	pattern1 = r'[-]?[0-9]+(\.[0-9]+)?[\*/][-]?[0-9]+(\.[0-9]+)?'
 	pattern2 = r'[-]?[0-9]+(\.[0-9]+)?[+-][-]?[0-9]+(\.[0-9]+)?'
 	pattern3 = r'[-]?[0-9]+(\.[0-9]+)?(\^|root)[-]?[0-9]+(\.[0-9]+)?'
 	pattern4 = r'\(((?![\(\)]).)+\)'
 	accuracy = 6 # Set default accuracy
+	constants = {'pi':math.pi, 'fi':(1_5**0.5)/2, 'e':math.e}
+	history = []
+	history_pos = 0
 	
 	def __init__(self):
 		self.set_win = False
@@ -28,6 +32,9 @@ class Calc:
 			if re.search(self.pattern_start, command):
 				self.textarea.delete(1.0, END)
 				self.textarea.insert(END, command)
+				if len(self.history) >= 10:
+					del self.history[0]
+				self.history.append(command)
 				self.analysis(command)
 			else:
 				self.warning['text'] = "Użyto niedozwolonych znaków"
@@ -42,10 +49,22 @@ class Calc:
 		self.textbox.delete(0, END)
 	
 	def showInfo(self):
-		messagebox.showinfo("Kalkulator - informacje", "Kalkulator v.2.0\nGrzegorz Babiarz 2017-2018\nGNU General Public License v3.0\nhttps://github.com/Programista3/Algorytmy/tree/master/Python/kalkulator")
+		messagebox.showinfo("Kalkulator - informacje", "Kalkulator v."+self.version+"\nGrzegorz Babiarz 2017-2018\nGNU General Public License v3.0\nhttps://github.com/Programista3/Algorytmy/tree/master/Python/kalkulator")
 
 	def quit(self):
 		self.root.destroy()
+
+	def historyKey(self, e):
+		if e.keysym == "Up":
+			if self.history_pos < 9:
+				self.history_pos += 1
+			self.textbox.delete(0, END)
+			self.textbox.insert(0, self.history[len(self.history)-self.history_pos-1])
+		elif e.keysym == "Down":
+			if self.history_pos > 0:
+				self.history_pos -= 1
+			self.textbox.delete(0, END)
+			self.textbox.insert(0, self.history[len(self.history)-self.history_pos-1])
 
 	def start_gui(self):
 		self.root = Tk()
@@ -60,6 +79,8 @@ class Calc:
 		self.textbox = ttk.Entry(self.root, width=85)
 		self.textbox.bind("<Return>", self.btnClick)
 		self.textbox.bind("<Delete>", self.clearTextbox)
+		self.textbox.bind("<Up>", self.historyKey)
+		self.textbox.bind("<Down>", self.historyKey)
 		self.textbox.pack(pady=10)
 		self.textarea = tkst.ScrolledText(self.root, width=62, height=9)
 		self.textarea.pack()
@@ -150,6 +171,8 @@ class Calc:
 		
 	def analysis(self, command):
 		command = command.replace(" ", "")
+		for key, val in self.constants.items():
+			command = command.replace(key, str(round(val, self.accuracy)))
 		calculation = re.search(self.pattern4, command)
 		if calculation:
 			calculation = calculation.group()
@@ -186,7 +209,9 @@ class Calc:
 			ac_pattern = r'accuracy: [0-9]+'
 			search = re.search(ac_pattern, config)
 			if search:
-				self.accuracy = int(search.group().split(': ')[1])
+				accuracy = int(search.group().split(': ')[1])
+				if accuracy >= 0 and accuracy <= 10:
+					self.accuracy = accuracy
 			
 	def format_result(self, number):
 		number = float(number)
@@ -200,14 +225,23 @@ class Calc:
 		self.set_win = False
 
 	def save_settings(self):
-		if os.path.isfile("config.dat"):
-			config = open("config.dat", "w")
-			config.write(self.configText.get(1.0, END).strip())
-		else:
-			config = open("config.dat", "w+")
-			config.write(self.configText.get(1.0, END).strip())
-		messagebox.showinfo("Zapisywanie ustawień", "Zmiany zostały zapisane")
-		config.close()
+		ac_pattern = r'accuracy: [0-9]+'
+		config_text = self.configText.get(1.0, END).strip()
+		search = re.search(ac_pattern, config_text)
+		if search:
+			accuracy = int(search.group().split(': ')[1])
+			if accuracy >= 0 and accuracy <= 10:
+				self.accuracy = accuracy
+				if os.path.isfile("config.dat"):
+					config = open("config.dat", "w")
+					config.write(config_text)
+				else:
+					config = open("config.dat", "w+")
+					config.write(config_text)
+				messagebox.showinfo("Zapisywanie ustawień", "Zmiany zostały zapisane")
+				config.close()
+			else:
+				messagebox.showinfo("Błąd", "Dokładność nie może być większa niż 10")
 
 	def settings(self):
 		if not self.set_win:
@@ -226,8 +260,12 @@ class Calc:
 				config.write(text)
 				self.configText.insert(END, text)
 			config.close()
+			frame = ttk.Frame(self.window)
+			frame.pack(pady=6)
 			btn = ttk.Button(self.window, text="Zapisz", command=self.save_settings)
-			btn.pack(pady=6)
+			btn.pack(in_=frame, side=LEFT)
+			exit = ttk.Button(self.window, text="Zamknij", command=self.close)
+			exit.pack(in_=frame)
 			self.window.resizable(0,0)
 			self.window.protocol("WM_DELETE_WINDOW", self.close)
 			
