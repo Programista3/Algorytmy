@@ -6,16 +6,19 @@ import tkinter.scrolledtext as tkst
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
+import matplotlib.pyplot as plt
 
 class Calc:
-	version = '2.1'
+	version = '2.2'
 	pattern_start = r'^([a-z0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
 	pattern_result = r'^[-]?[0-9]+(\.[0-9]+)?$'
 	pattern1 = r'[-]?[0-9]+(\.[0-9]+)?[\*/][-]?[0-9]+(\.[0-9]+)?'
 	pattern2 = r'[-]?[0-9]+(\.[0-9]+)?[+-][-]?[0-9]+(\.[0-9]+)?'
 	pattern3 = r'[-]?[0-9]+(\.[0-9]+)?(\^|root)[-]?[0-9]+(\.[0-9]+)?'
 	pattern4 = r'\(((?![\(\)]).)+\)'
+	pattern5 = r'^(f\(x\)|y)=([-]?[0-9]+)x([+-][0-9]+)$'
 	accuracy = 6 # Set default accuracy
+	autocalc = False
 	constants = {'pi':math.pi, 'fi':(1_5**0.5)/2, 'e':math.e}
 	history = []
 	history_pos = 0
@@ -66,6 +69,26 @@ class Calc:
 			self.textbox.delete(0, END)
 			self.textbox.insert(0, self.history[len(self.history)-self.history_pos-1])
 
+	def autocalculation(self, e):
+		search = re.search(self.pattern5, self.textbox.get())
+		if search:
+			self.chart.pack(in_=self.bottom, pady=4)
+		else:
+			self.chart.pack_forget()
+			self.btnClick()
+
+	def drawChart(self):
+		search = re.search(self.pattern5, self.textbox.get())
+		x = [-2, 2]
+		y = [int(search.group(2))*i+int(search.group(3)) for i in x]
+		plt.gca().set_prop_cycle('color', ['black', 'black', 'red'])
+		plt.plot([0, 0], [max(y), min(y)])
+		plt.plot(x, [0, 0])
+		plt.plot(x, y)
+		plt.title(search.group())
+		plt.grid(True)
+		plt.show()
+
 	def start_gui(self):
 		self.root = Tk()
 		self.root.geometry('{}x{}'.format(550, 250))
@@ -81,17 +104,20 @@ class Calc:
 		self.textbox.bind("<Delete>", self.clearTextbox)
 		self.textbox.bind("<Up>", self.historyKey)
 		self.textbox.bind("<Down>", self.historyKey)
+		if self.autocalc:
+			self.textbox.bind("<KeyRelease>", self.autocalculation)
 		self.textbox.pack(pady=10)
 		self.textarea = tkst.ScrolledText(self.root, width=62, height=9)
 		self.textarea.pack()
 		self.warning = ttk.Label(self.root, text="")
 		self.warning.pack()
-		bottom = Frame(self.root)
-		bottom.pack()
+		self.bottom = Frame(self.root)
+		self.bottom.pack()
 		clear = ttk.Button(self.root, command=self.clearText, text="Wyczyść")
-		clear.pack(in_=bottom, side=LEFT)
+		clear.pack(in_=self.bottom, side=LEFT)
 		button = ttk.Button(self.root, command=self.btnClick, text='Oblicz')
-		button.pack(in_=bottom, padx=4, pady=4)
+		button.pack(in_=self.bottom, side=LEFT, padx=4, pady=4)
+		self.chart = ttk.Button(self.root, command=self.drawChart, text='Wykres')
 		self.root.config(menu=menu)
 		self.root.resizable(0,0)
 		self.root.mainloop()
@@ -184,8 +210,9 @@ class Calc:
 					self.textarea.insert(END, "="+command)
 					self.analysis(command)
 				else:
-					self.textbox.delete()
-					self.textbox.insert(0, command)
+					if not self.autocalc:
+						self.textbox.delete()
+						self.textbox.insert(0, command)
 					self.textarea.insert(END, "="+command)
 			else:
 				self.textarea.delete(1.0, END)
@@ -197,8 +224,9 @@ class Calc:
 					self.textarea.insert(END, "="+command)
 					self.analysis(command)
 				else:
-					self.textbox.delete(0, END)
-					self.textbox.insert(0, command)
+					if not self.autocalc:
+						self.textbox.delete(0, END)
+						self.textbox.insert(0, command)
 					self.textarea.insert(END, "="+command)
 			else:
 				self.textarea.delete(1.0, END)
@@ -206,12 +234,17 @@ class Calc:
 	def read_settings(self):
 		if os.path.isfile('config.dat'):
 			config = open("config.dat", "r").read()
-			ac_pattern = r'accuracy: [0-9]+'
+			ac_pattern = r'accuracy: ([0-9]+)'
+			atc_pattern = r'autocalc: ([10]|True|False|true|false)'
 			search = re.search(ac_pattern, config)
 			if search:
-				accuracy = int(search.group().split(': ')[1])
+				accuracy = int(search.group(1))
 				if accuracy >= 0 and accuracy <= 10:
 					self.accuracy = accuracy
+			search2 = re.search(atc_pattern, config)
+			if search2:
+				if search2.group(1) == '1' or search2.group(1) == 'True' or search2.group(1) == 'true':
+					self.autocalc = True
 			
 	def format_result(self, number):
 		number = float(number)
