@@ -9,12 +9,12 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 
 class Calc:
-	version = '2.2'
-	pattern_start = r'^([a-z0-9\+\*/\^(\sroot\s)\(\)\.-]+)$'
+	version = '2.3'
+	pattern_start = r'^([a-z0-9\+\*/\^(\sroot\s)\(\)\.,-]+)$'
 	pattern_result = r'^[-]?[0-9]+(\.[0-9]+)?$'
-	pattern1 = r'[-]?[0-9]+(\.[0-9]+)?[\*/][-]?[0-9]+(\.[0-9]+)?'
-	pattern2 = r'[-]?[0-9]+(\.[0-9]+)?[+-][-]?[0-9]+(\.[0-9]+)?'
-	pattern3 = r'[-]?[0-9]+(\.[0-9]+)?(\^|root)[-]?[0-9]+(\.[0-9]+)?'
+	pattern1 = r'([-]?[0-9]+(\.[0-9]+)?)([+-])([-]?[0-9]+(\.[0-9]+)?)'
+	pattern2 = r'([-]?[0-9]+(\.[0-9]+)?)([\*/])([-]?[0-9]+(\.[0-9]+)?)'
+	pattern3 = r'([-]?[0-9]+(\.[0-9]+)?)(root|\^)([-]?[0-9]+(\.[0-9]+)?)'
 	pattern4 = r'\(((?![\(\)]).)+\)'
 	pattern5 = r'^(f\(x\)|y)=([-]?[0-9]+)x([+-][0-9]+)$'
 	accuracy = 6 # Set default accuracy
@@ -30,7 +30,7 @@ class Calc:
 		
 	def btnClick(self, e=None):
 		self.warning['text'] = ""
-		command = self.textbox.get()
+		command = self.textbox.get().replace(",", ".")
 		if len(command) > 1:
 			if re.search(self.pattern_start, command):
 				self.textarea.delete(1.0, END)
@@ -70,12 +70,13 @@ class Calc:
 			self.textbox.insert(0, self.history[len(self.history)-self.history_pos-1])
 
 	def autocalculation(self, e):
-		search = re.search(self.pattern5, self.textbox.get())
-		if search:
-			self.chart.pack(in_=self.bottom, pady=4)
-		else:
-			self.chart.pack_forget()
-			self.btnClick()
+		if self.autocalc:
+			search = re.search(self.pattern5, self.textbox.get())
+			if search:
+				self.chart.pack(in_=self.bottom, pady=4)
+			else:
+				self.chart.pack_forget()
+				self.btnClick()
 
 	def drawChart(self):
 		search = re.search(self.pattern5, self.textbox.get())
@@ -104,8 +105,7 @@ class Calc:
 		self.textbox.bind("<Delete>", self.clearTextbox)
 		self.textbox.bind("<Up>", self.historyKey)
 		self.textbox.bind("<Down>", self.historyKey)
-		if self.autocalc:
-			self.textbox.bind("<KeyRelease>", self.autocalculation)
+		self.textbox.bind("<KeyRelease>", self.autocalculation)
 		self.textbox.pack(pady=10)
 		self.textarea = tkst.ScrolledText(self.root, width=62, height=9)
 		self.textarea.pack()
@@ -127,73 +127,41 @@ class Calc:
 		calculation2 = re.search(self.pattern2, command)
 		calculation3 = re.search(self.pattern3, command)
 		if calculation3:
-			calculation = calculation3.group().replace(" ", "")
-			symbol = calculation.find('^')
-			if symbol != -1:
-				elements = list(map(float, calculation.split('^')))
-				result2 = elements[0]**elements[1]
-			else:
-				symbol = calculation.find('root')
-				if symbol != -1:
-					elements = list(map(float, calculation.split('root')))
-					if elements[1] < 0:
-						if elements[0]%2 == 0:
-							self.warning['text'] = "Nie można obliczyć pierwiastka stopnia parzystego z liczby ujemnej!"
-							return False, False
-						else:
-							result2 = -(round((-elements[1])**(1/float(elements[0])), self.accuracy))
-					else:
-						result2 = round(elements[1]**(1/float(elements[0])), self.accuracy)
-				else:
-					self.warning['text'] = "Błąd: niezindentyfikowane działanie"
+			if calculation3.group(3) == '^':
+				return calculation3.group(), float(calculation3.group(1))**float((calculation3.group(4)))
+			elif calculation3.group(3) == 'root':
+				if float(calculation3.group(4)) < 0 and float(calculation3.group(1))%2 == 0:
+					self.warning['text'] = "Nie można obliczyć pierwiastka stopnia parzystego z liczby ujemnej!"
 					return False, False
-			return calculation, result2
-		elif calculation1:
-			calculation = calculation1.group()
-			symbol = calculation.find('*')
-			if symbol != -1:
-				elements = list(map(float, calculation.split('*')))
-				result2 = elements[0]*elements[1]
-			else:
-				symbol = calculation.find('/')
-				if symbol != -1:
-					elements = list(map(float, calculation.split('/')))
-					if elements[1] != 0:
-						result2 = elements[0]/elements[1]
-					else:
-						self.warning['text'] = "Nie można dzielić przez 0"
-						return False, False
 				else:
-					self.warning['text'] = "Błąd: niezindentyfikowane działanie"
-					return False, False
-			return calculation, result2
+					return calculation3.group(), float(calculation3.group(4))**(1/float(calculation3.group(1)))
+			else:
+				self.warning['text'] = "Błąd: niezindentyfikowane działanie"
+				return False, False
 		elif calculation2:
-			calculation = calculation2.group()
-			symbol = calculation.find('+')
-			if symbol != -1:
-				elements = list(map(float, calculation.split('+')))
-				result2 = elements[0]+elements[1]
-			else:
-				count = calculation.count('-')
-				minus = [result.start() for result in re.finditer('-', calculation)]
-				if count == 3:
-					index = 1
-				elif count == 2:
-					if calculation[0] == '-':
-						index = 1
-					else:
-						index = 0
-				elif count == 1:
-					index = 0
+			if calculation2.group(3) == '*':
+    				return calculation2.group(), float(calculation2.group(1))*float(calculation2.group(4))
+			elif calculation2.group(3) == '/':
+				if float(calculation2.group(4)) != 0:
+					return calculation2.group(), float(calculation2.group(1))/float(calculation2.group(4))
 				else:
-					self.warning['text'] = "Błąd: niezindentyfikowane działanie"
+					self.warning['text'] = "Nie można dzielić przez 0"
 					return False, False
-				elements = [float(calculation[:minus[index]]), float(calculation[minus[index]+1:])]
-				result2 = elements[0]-elements[1]
-			return calculation, result2
+			else:
+				self.warning['text'] = "Błąd: niezindentyfikowane działanie"
+				return False, False
+		elif calculation1:
+			if calculation1.group(3) == '+':
+				return calculation1.group(), float(calculation1.group(1))+float(calculation1.group(4))
+			elif calculation3.group(3) == '-':
+				return calculation1.group(), float(calculation1.group(1))-float(calculation1.group(4))
+			else:
+				self.warning['text'] = "Błąd: niezindentyfikowane działanie"
+				return False, False
 		else:
-			self.warning['text'] = "Niepoprawne działanie"
-			return False, False
+			if not self.autocalculation:
+				self.warning['text'] = "Niepoprawne działanie"
+			return False, False	
 		
 	def analysis(self, command):
 		command = command.replace(" ", "")
@@ -258,23 +226,30 @@ class Calc:
 		self.set_win = False
 
 	def save_settings(self):
-		ac_pattern = r'accuracy: [0-9]+'
+		ac_pattern = r'accuracy: ([0-9]+)'
+		atc_pattern = r'autocalc: ([10]|True|False|true|false)'
 		config_text = self.configText.get(1.0, END).strip()
+		err = None
 		search = re.search(ac_pattern, config_text)
+		search2 = re.search(atc_pattern, config_text)
 		if search:
-			accuracy = int(search.group().split(': ')[1])
+			accuracy = float(search.group(1))
 			if accuracy >= 0 and accuracy <= 10:
 				self.accuracy = accuracy
-				if os.path.isfile("config.dat"):
-					config = open("config.dat", "w")
-					config.write(config_text)
-				else:
-					config = open("config.dat", "w+")
-					config.write(config_text)
+			else:
+				err = "Dokładność nie może być większa niż 10"
+		if search2:
+			if search2.group(1) == '1' or search2.group(1) == 'true' or search2.group(1) == 'True':
+				self.autocalc = True
+			else:
+				self.autocalc = False
+		if not err:
+				config = open("config.dat", "w")
+				config.write(config_text)
 				messagebox.showinfo("Zapisywanie ustawień", "Zmiany zostały zapisane")
 				config.close()
-			else:
-				messagebox.showinfo("Błąd", "Dokładność nie może być większa niż 10")
+		else:
+			messagebox.showinfo("Błąd", err)
 
 	def settings(self):
 		if not self.set_win:
