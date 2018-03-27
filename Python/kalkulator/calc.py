@@ -9,7 +9,7 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 
 class Calc:
-	version = '2.3'
+	version = '2.3.1'
 	pattern_start = r'^([a-z0-9\+\*/\^(\sroot\s)\(\)\.,-]+)$'
 	pattern_result = r'^[-]?[0-9]+(\.[0-9]+)?$'
 	pattern1 = r'([-]?[0-9]+(\.[0-9]+)?)([+-])([-]?[0-9]+(\.[0-9]+)?)'
@@ -19,7 +19,7 @@ class Calc:
 	pattern5 = r'^(f\(x\)|y)=([-]?[0-9]+)x([+-][0-9]+)$'
 	accuracy = 6 # Set default accuracy
 	autocalc = False
-	constants = {'pi':math.pi, 'fi':(1_5**0.5)/2, 'e':math.e}
+	constants = {'pi':math.pi, 'fi':(1.5**0.5)/2, 'e':math.e}
 	history = []
 	history_pos = 0
 	
@@ -153,7 +153,7 @@ class Calc:
 		elif calculation1:
 			if calculation1.group(3) == '+':
 				return calculation1.group(), float(calculation1.group(1))+float(calculation1.group(4))
-			elif calculation3.group(3) == '-':
+			elif calculation1.group(3) == '-':
 				return calculation1.group(), float(calculation1.group(1))-float(calculation1.group(4))
 			else:
 				self.warning['text'] = "Błąd: niezindentyfikowane działanie"
