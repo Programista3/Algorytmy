@@ -1,3 +1,3 @@
-# Algorytmy
-Programy testowane w środowisku Windows 10 z wykorzystaniem Pythona 3.6.3<br/><br/>
-Grzegorz Babiarz 2017-2018
+# pyCalc
+Calculator made in Python using `tkinter`<br/><br/>
+Code tested in Windows 10 with Python 3.6.3
