@@ -2,8 +2,28 @@
 from tkinter import *
 import tkinter.ttk as ttk
 
+class Stack:
+    def __init__(self):
+        self.stack = []
+    
+    def push(self, item):
+        self.stack.append(item)
+
+    def pop(self):
+        self.stack.pop(len(self.stack)-1)
+
+    def top(self):
+        return self.stack[len(self.stack)-1]
+
+    def size(self):
+        return len(self.stack)
+
+    def get(self):
+        return sorted(self.stack, reverse=True)
+
+
 class pyCalc:
-    version = "3.0.2"
+    version = "3.0.3"
 
     def __init__(self):
         self.startGui()
@@ -41,8 +61,45 @@ class pyCalc:
         self.root.mainloop()
 
     def click(self, btn):
-        self.textbox.insert(0, btn)
+        if(btn == '='):
+            print(self.convertToRPN(self.textbox.get()))
+        else:
+            self.textbox.insert(END, btn)
 
-    def convertToRPN(self):
-        pass
+    def isOperator(self, char):
+        return char in ['+','-','*','/','^']
+
+    def priority(self, operator):
+        if(operator == '+' or operator == '-'):
+            return 1
+        elif(operator == '*' or operator == '/'):
+            return 2
+        elif(operator == '^'):
+            return 3
+        elif(operator == '('):
+            return 0
+
+    def convertToRPN(self, text):
+        stack = Stack()
+        output = []
+        for c in text:
+            if(c.isdigit()):
+                output.append(c)
+            elif(self.isOperator(c)):
+                for i in range(stack.size()):
+                    if(self.priority(c) == 3 or self.priority(c) > self.priority(stack.top())):
+                        break
+                    output.append(stack.top())
+                    stack.pop()
+                stack.push(c)
+            elif(c == '('):
+                stack.push(c)
+            elif(c == ')'):
+                while stack.top() != '(':
+                    output.append(stack.top())
+                    stack.pop()
+                stack.pop()
+        output.extend(stack.get())
+        return output
+
 calc = pyCalc()
