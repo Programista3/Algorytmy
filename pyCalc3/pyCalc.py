@@ -19,11 +19,11 @@ class Stack:
         return len(self.stack)
 
     def get(self):
-        return sorted(self.stack, reverse=True)
+        return self.stack[::-1]
 
 
 class pyCalc:
-    version = "3.0.3"
+    version = "3.0.4"
 
     def __init__(self):
         self.startGui()
@@ -32,37 +32,31 @@ class pyCalc:
         self.root = Tk()
         self.root.title("pyCalc v."+self.version)
         ttk.Style().configure("TButton", padding=(-10,10,-10,10), font=('16'))
-        self.textbox = ttk.Entry(self.root, font=('Helvetica', '16'), justify=RIGHT)
-        self.textbox.grid(row=0, columnspan=4, sticky=W+E, padx=3, pady=3)
-        btnLabels = ['7','8','9','/','4','5','6','*','1','2','3','-','.','0','=','+']
+        btnLabels = [
+            ['C','7','8','9','/'],
+            ['AC','4','5','6','*'],
+            ['(','1','2','3','-'],
+            [')','.','0','=','+']
+        ]
+        self.frame = Frame(self.root)
+        self.frame.grid(row=0, column=0, rowspan=len(btnLabels)+1, columnspan=len(btnLabels[0]))
+        self.textbox = ttk.Entry(self.frame, font=('Helvetica', '16'), justify=RIGHT)
+        self.textbox.grid(row=0, columnspan=len(btnLabels[0]), sticky=W+E, padx=3, pady=3)
         self.btn = []
-        i = 0
-        for r in range(1,5):
-            for c in range(4):
-                self.btn.append(ttk.Button(self.root, text=btnLabels[i]))
-                self.btn[i].grid(row=r, column=c, padx=2, pady=2)
-                i += 1
-        self.btn[0].configure(command=lambda:self.click(btnLabels[0]))
-        self.btn[1].configure(command=lambda:self.click(btnLabels[1]))
-        self.btn[2].configure(command=lambda:self.click(btnLabels[2]))
-        self.btn[3].configure(command=lambda:self.click(btnLabels[3]))
-        self.btn[4].configure(command=lambda:self.click(btnLabels[4]))
-        self.btn[5].configure(command=lambda:self.click(btnLabels[5]))
-        self.btn[6].configure(command=lambda:self.click(btnLabels[6]))
-        self.btn[7].configure(command=lambda:self.click(btnLabels[7]))
-        self.btn[8].configure(command=lambda:self.click(btnLabels[8]))
-        self.btn[9].configure(command=lambda:self.click(btnLabels[9]))
-        self.btn[10].configure(command=lambda:self.click(btnLabels[10]))
-        self.btn[11].configure(command=lambda:self.click(btnLabels[11]))
-        self.btn[12].configure(command=lambda:self.click(btnLabels[12]))
-        self.btn[13].configure(command=lambda:self.click(btnLabels[13]))
-        self.btn[14].configure(command=lambda:self.click(btnLabels[14]))
-        self.btn[15].configure(command=lambda:self.click(btnLabels[15]))
+        for r in range(1,len(btnLabels)+1):
+            for c in range(len(btnLabels[0])):
+                self.btn.append(ttk.Button(self.frame, text=btnLabels[r-1][c]))
+                self.btn[len(self.btn)-1].grid(row=r, column=c, padx=2, pady=2)
+                self.btn[len(self.btn)-1].configure(command=lambda text=btnLabels[r-1][c]:self.click(text))
         self.root.mainloop()
 
     def click(self, btn):
         if(btn == '='):
-            print(self.convertToRPN(self.textbox.get()))
+            print(self.calculateRPN(self.convertToRPN(self.textbox.get())))
+        elif(btn == 'C'):
+            self.textbox.delete(0, END)
+        elif(btn == 'AC'):
+            self.textbox.delete(len(self.textbox.get())-1, END)
         else:
             self.textbox.insert(END, btn)
 
@@ -101,5 +95,19 @@ class pyCalc:
                 stack.pop()
         output.extend(stack.get())
         return output
+
+    def calculateRPN(self, rpn):
+        stack = Stack()
+        output = []
+        for c in rpn:
+            if(c.isdigit()):
+                stack.push(c)
+            elif(self.isOperator(c)):
+                a = stack.top()
+                stack.pop()
+                b = stack.top()
+                stack.pop()
+                stack.push(eval(str(a)+c+str(b)))
+        return stack.top()
 
 calc = pyCalc()
