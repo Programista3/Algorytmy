@@ -22,7 +22,7 @@ class Stack:
         return self.stack[::-1]
 
 class pyCalc:
-    version = "3.0.5"
+    version = "3.0.6"
 
     def __init__(self):
         self.startGui()
@@ -55,6 +55,7 @@ class pyCalc:
 
     def click(self, btn):
         if(btn == '='):
+            #print(self.convertToRPN(self.textbox.get()))
             result = self.calculateRPN(self.convertToRPN(self.textbox.get()))
             self.textbox.delete(0, END)
             self.textbox.insert(END, result)
@@ -92,16 +93,25 @@ class pyCalc:
         text = text.replace(',', '.')
         stack = Stack()
         output = []
+        negative = False
         for i in range(len(text)):
             if(text[i].isdigit()):
                 if(i > 0) and (text[i-1].isdigit() or text[i-1] == '.'):
                     output[len(output)-1] += text[i]
                 else:
-                    output.append(text[i])
+                    if(negative):
+                        output.append("-"+text[i])
+                        negative = False
+                    else:
+                        output.append(text[i])
             elif(text[i] == '.'):
                 output[len(output)-1] += text[i]
             elif(self.isOperator(text[i])):
-                for i in range(stack.size()):
+                if(text[i] == '-'):
+                    if((i == 0) or (self.isOperator(text[i-1])) or text[i-1] == '(') and negative == False:
+                        negative = True
+                        continue
+                for j in range(stack.size()):
                     if(self.priority(text[i]) == 3 or self.priority(text[i]) > self.priority(stack.top())):
                         break
                     output.append(stack.top())
@@ -109,6 +119,8 @@ class pyCalc:
                 stack.push(text[i])
             elif(text[i] == '('):
                 stack.push(text[i])
+                if(negative):
+                    negative = False # temporarily
             elif(text[i] == ')'):
                 while stack.top() != '(':
                     output.append(stack.top())
@@ -130,7 +142,16 @@ class pyCalc:
                 stack.pop()
                 b = stack.top()
                 stack.pop()
-                stack.push(eval(str(a)+c+str(b)))
+                if(c == "+"):
+                    stack.push(b+a)
+                elif(c == "-"):
+                    stack.push(b-a)
+                elif(c == "*"):
+                    stack.push(b*a)
+                elif(c == "/"):
+                    stack.push(b/a)
+                elif(c == "^"):
+                    stack.push(b**a)
         return stack.top()
 
 calc = pyCalc()
