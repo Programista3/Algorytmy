@@ -22,24 +22,27 @@ class Stack:
         return self.stack[::-1]
 
 class pyCalc:
-    version = "3.0.6"
+    version = "3.0.7"
 
     def __init__(self):
         self.startGui()
 
     def startGui(self):
+        self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√']
         self.root = Tk()
         self.root.title("pyCalc v."+self.version)
+        self.root.resizable(False, False)
         ttk.Style().configure("TButton", padding=(-10,10,-10,10), font=('16'))
         btnLabels = [
-            ['C','7','8','9','/'],
-            ['AC','4','5','6','*'],
-            ['(','1','2','3','-'],
-            [')','.','0','=','+']
+            ['ᵪ²','ᵪʸ','C','AC','/'],
+            ['√','7','8','9','*'],
+            ['%','4','5','6','-'],
+            ['‰','1','2','3','+'],
+            ['(',')','0','.','=']
         ]
         self.frame = Frame(self.root)
         self.frame.grid(row=0, column=0, rowspan=len(btnLabels)+1, columnspan=len(btnLabels[0]))
-        self.textbox = ttk.Entry(self.frame, font=('Helvetica', '16'), justify=RIGHT)
+        self.textbox = ttk.Label(self.frame, text="0", font=('Helvetica', '18'), anchor="e")
         self.root.bind("<Return>", lambda event: self.click("="))
         self.root.bind("<BackSpace>", lambda event: self.click("AC"))
         self.root.bind("<Delete>", lambda event: self.click("C"))
@@ -55,19 +58,46 @@ class pyCalc:
 
     def click(self, btn):
         if(btn == '='):
-            #print(self.convertToRPN(self.textbox.get()))
-            result = self.calculateRPN(self.convertToRPN(self.textbox.get()))
-            self.textbox.delete(0, END)
-            self.textbox.insert(END, result)
+            #print(self.convertToRPN(self.textbox['text']))
+            result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
+            self.textbox['text'] = str(result)
         elif(btn == 'C'):
-            self.textbox.delete(0, END)
+            self.textbox['text'] = "0"
         elif(btn == 'AC'):
-            self.textbox.delete(len(self.textbox.get())-1, END)
-        else:
-            self.textbox.insert(END, btn)
+            if(len(self.textbox['text']) > 1):
+                self.textbox['text'] = self.textbox['text'][:-1]
+            else:
+                self.textbox['text'] = "0"
+        elif(btn == 'ᵪ²'):
+            if(self.textbox['text'][-1:].isdigit()):
+                self.textbox['text'] += '^2'
+        elif(btn == 'ᵪʸ'):
+            if(self.textbox['text'][-1:].isdigit()):
+                self.textbox['text'] += '^'
+        elif(btn in self.chars):
+            if(self.textbox['text'] == "0"):
+                if(btn in ['1','2','3','4','5','6','7','8','9','(','-','√']):
+                    self.textbox['text'] = btn
+                elif(btn in [',','.']):
+                    self.textbox['text'] += btn
+            elif(self.textbox['text'][-1:].isdigit()):
+                if(btn in [',','.','+','-','*','/','^',')'] or btn.isdigit()):
+                    self.textbox['text'] += btn
+            elif(self.textbox['text'][-1:] == ')'):
+                if(btn in ['+','-','*','/','^']):
+                    self.textbox['text'] += btn
+            elif(self.textbox['text'][-1:] in ['+','-','*','/','^']):
+                if(btn.isdigit() or btn in ['√','(']):
+                    self.textbox['text'] += btn
+            elif(self.textbox['text'][-1:] in [',','.','√']):
+                if(btn.isdigit()):
+                    self.textbox['text'] += btn
+            elif(self.textbox['text'][-1:] == '('):
+                if(btn.isdigit() or btn == '√'):
+                    self.textbox['text'] += btn
 
     def isOperator(self, char):
-        return char in ['+','-','*','/','^']
+        return char in ['+','-','*','/','^','√']
 
     def isNumner(self, str):
         if(str.isdigit()):
@@ -84,7 +114,7 @@ class pyCalc:
             return 1
         elif(operator == '*' or operator == '/'):
             return 2
-        elif(operator == '^'):
+        elif(operator == '^' or operator == '√'):
             return 3
         elif(operator == '('):
             return 0
@@ -94,16 +124,23 @@ class pyCalc:
         stack = Stack()
         output = []
         negative = False
+        brackets = []
         for i in range(len(text)):
             if(text[i].isdigit()):
                 if(i > 0) and (text[i-1].isdigit() or text[i-1] == '.'):
                     output[len(output)-1] += text[i]
                 else:
                     if(negative):
-                        output.append("-"+text[i])
+                        if(len(brackets) > 0 and brackets[len(brackets)-1] == True):
+                            output.append(text[i])
+                        else:
+                            output.append("-"+text[i])
                         negative = False
                     else:
-                        output.append(text[i])
+                        if(len(brackets) > 0 and brackets[len(brackets)-1] == True):
+                            output.append("-"+text[i])
+                        else:
+                            output.append(text[i])
             elif(text[i] == '.'):
                 output[len(output)-1] += text[i]
             elif(self.isOperator(text[i])):
@@ -120,12 +157,16 @@ class pyCalc:
             elif(text[i] == '('):
                 stack.push(text[i])
                 if(negative):
-                    negative = False # temporarily
+                    negative = False
+                    brackets.append(True)
+                else:
+                    brackets.append(False)
             elif(text[i] == ')'):
                 while stack.top() != '(':
                     output.append(stack.top())
                     stack.pop()
                 stack.pop()
+                brackets.pop()
         output.extend(stack.get())
         return output
 
@@ -138,20 +179,25 @@ class pyCalc:
             elif(self.isNumner(c) == 2):
                 stack.push(float(c))
             elif(self.isOperator(c)):
-                a = stack.top()
-                stack.pop()
-                b = stack.top()
-                stack.pop()
-                if(c == "+"):
-                    stack.push(b+a)
-                elif(c == "-"):
-                    stack.push(b-a)
-                elif(c == "*"):
-                    stack.push(b*a)
-                elif(c == "/"):
-                    stack.push(b/a)
-                elif(c == "^"):
-                    stack.push(b**a)
-        return stack.top()
+                if(c == '√'):
+                    a = stack.top()
+                    stack.pop()
+                    stack.push(a**0.5)
+                else:
+                    a = stack.top()
+                    stack.pop()  
+                    b = stack.top()
+                    stack.pop()
+                    if(c == "+"):
+                        stack.push(b+a)
+                    elif(c == "-"):
+                        stack.push(b-a)
+                    elif(c == "*"):
+                        stack.push(b*a)
+                    elif(c == "/"):
+                        stack.push(b/a)
+                    elif(c == "^"):
+                        stack.push(b**a)
+        return int(stack.top()) if stack.top().is_integer() else stack.top()
 
 calc = pyCalc()
