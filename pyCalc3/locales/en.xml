@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lang code="en">
+    <translation text="menu1">Options</translation>
+    <translation text="menu1.1">Language</translation>
+    <translation text="menu1.1.1">Polish</translation>
+    <translation text="menu1.1.2">English</translation>
+    <translation text="error">Error</translation>
+    <translation text="err1">Cannot divide by zero!</translation>
+</lang>
