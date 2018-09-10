@@ -2,6 +2,7 @@
 from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
+import os
 import lang
 _ = lang.get
 
@@ -29,19 +30,20 @@ class Stack:
         return self.stack[::-1]
 
 class pyCalc:
-    version = "3.1.0"
-
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
+        self.version = "3.1.1"
+        self.languages = ['pl','en']
         self.lang = "pl"
         self.startGui()
 
     def startGui(self):
         self.root = Tk()
-        self.root.title("pyCalc v."+self.version)
+        self.root.title("pyCalc3")
         self.root.iconbitmap('pycalc.ico')
         self.root.resizable(False, False)
-        ttk.Style().configure("TButton", padding=(-10,10,-10,10), font=('16'))
+        self.style = ttk.Style()
+        self.style.configure("TButton", padding=(-10,10,-10,10), font=('16'))
         btnLabels = [
             ['ᵪ²','ᵪʸ','C','AC','/'],
             ['√','7','8','9','*'],
@@ -49,15 +51,41 @@ class pyCalc:
             ['‰','1','2','3','+'],
             ['(',')','0','.','=']
         ]
+        vTheme = StringVar(value=self.style.theme_use())
+        if(os.path.isfile('settings.dat')):
+            file = open('settings.dat')
+            text = file.read()
+            file.close()
+            if(len(text) == 2):
+                if(int(text[0]) < len(self.languages)):
+                    self.lang = self.languages[int(text[0])]
+                    lang.select(self.lang)
+                if(int(text[1]) < len(self.style.theme_names())):
+                    vTheme = StringVar(value=self.style.theme_names()[int(text[1])])
+                    self.style.theme_use(self.style.theme_names()[int(text[1])])
+        vLang = StringVar(value=self.lang)
+
         menu = Menu(self.root)
+        menuFunctions = Menu(self.root, tearoff=0)
         menuOptions = Menu(self.root, tearoff=0)
         menuLanguage = Menu(self.root, tearoff=0)
-        vLang = StringVar(value=self.lang)
-        menuLanguage.add_radiobutton(label=_("menu1.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
-        menuLanguage.add_radiobutton(label=_("menu1.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
-        menu.add_cascade(label=_("menu1"), menu=menuOptions)
-        menuOptions.add_cascade(label=_("menu1.1"), menu=menuLanguage)
-        self.frame = Frame(self.root)
+        menuTheme = Menu(self.root, tearoff=0)
+        menuHelp = Menu(self.root, tearoff=0)
+
+        menu.add_cascade(label=_("menu1"), menu=menuFunctions, state="disabled")
+        menu.add_cascade(label=_("menu2"), menu=menuOptions)
+        menu.add_cascade(label=_("menu3"), menu=menuHelp)
+
+        menuOptions.add_cascade(label=_("menu2.1"), menu=menuLanguage)
+        menuOptions.add_cascade(label=_("menu2.2"), menu=menuTheme)
+        menuHelp.add_command(label=_("menu3.1"), command=self.info)
+
+        menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
+        menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
+        for i in self.style.theme_names():
+            menuTheme.add_radiobutton(label=i.capitalize(), var=vTheme, value=i, command=lambda th=i: self.changeTheme(th))
+
+        self.frame = ttk.Frame(self.root)
         self.frame.grid(row=0, column=0, rowspan=len(btnLabels)+1, columnspan=len(btnLabels[0]))
         self.textbox = ttk.Label(self.frame, text="0", font=('Helvetica', '18'), anchor="e")
         self.root.bind("<Return>", lambda event: self.click("="))
@@ -74,15 +102,26 @@ class pyCalc:
                 self.btn[len(self.btn)-1].configure(command=lambda text=btnLabels[r-1][c]:self.click(text))
         self.root.mainloop()
 
+    def info(self):
+        messagebox.showinfo(_("menu2.1"), ("pyCalc v."+self.version+"\nGNU AGPL v.3.0\nhttps://github.com/Programista3/pyCalc"))
+
+    def changeTheme(self, theme):
+        self.style.theme_use(theme)
+        file = open('settings.dat', 'w')
+        file.write(str(self.languages.index(self.lang))+str(self.style.theme_names().index(self.style.theme_use())))
+        file.close()
+
     def selectLanguage(self, language):
         lang.select(language)
         self.lang = language
+        file = open('settings.dat', 'w')
+        file.write(str(self.languages.index(self.lang))+str(self.style.theme_names().index(self.style.theme_use())))
+        file.close()
         self.root.destroy()
         self.startGui()
 
     def click(self, btn):
         if(btn == '='):
-            #print(self.convertToRPN(self.textbox['text']))
             result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
             self.textbox['text'] = str(result)
         elif(btn == 'C'):

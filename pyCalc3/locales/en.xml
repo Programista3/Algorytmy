@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lang code="en">
-    <translation text="menu1">Options</translation>
-    <translation text="menu1.1">Language</translation>
-    <translation text="menu1.1.1">Polish</translation>
-    <translation text="menu1.1.2">English</translation>
+    <translation text="menu1">Functions</translation>
+    <translation text="menu2">Options</translation>
+    <translation text="menu2.1">Language</translation>
+    <translation text="menu2.2">Theme</translation>
+    <translation text="menu2.1.1">Polish</translation>
+    <translation text="menu2.1.2">English</translation>
+    <translation text="menu3">Help</translation>
+    <translation text="menu3.1">pyCalc - Informations</translation>
     <translation text="error">Error</translation>
     <translation text="err1">Cannot divide by zero!</translation>
 </lang>
