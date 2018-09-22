@@ -32,7 +32,7 @@ class Stack:
 class pyCalc:
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
-        self.version = "3.1.1"
+        self.version = "3.1.2"
         self.languages = ['pl','en']
         self.lang = "pl"
         self.startGui()
@@ -43,7 +43,7 @@ class pyCalc:
         self.root.iconbitmap('pycalc.ico')
         self.root.resizable(False, False)
         self.style = ttk.Style()
-        self.style.configure("TButton", padding=(-10,10,-10,10), font=('16'))
+        self.style.configure("big.TButton", padding=(-10,10,-10,10), font=('16'))
         btnLabels = [
             ['ᵪ²','ᵪʸ','C','AC','/'],
             ['√','7','8','9','*'],
@@ -72,13 +72,14 @@ class pyCalc:
         menuTheme = Menu(self.root, tearoff=0)
         menuHelp = Menu(self.root, tearoff=0)
 
-        menu.add_cascade(label=_("menu1"), menu=menuFunctions, state="disabled")
+        menu.add_cascade(label=_("menu1"), menu=menuFunctions)
         menu.add_cascade(label=_("menu2"), menu=menuOptions)
         menu.add_cascade(label=_("menu3"), menu=menuHelp)
 
         menuOptions.add_cascade(label=_("menu2.1"), menu=menuLanguage)
         menuOptions.add_cascade(label=_("menu2.2"), menu=menuTheme)
         menuHelp.add_command(label=_("menu3.1"), command=self.info)
+        menuFunctions.add_command(label=_("menu1.1"), command=self.screenSize)
 
         menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
         menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
@@ -97,13 +98,141 @@ class pyCalc:
         self.btn = []
         for r in range(1,len(btnLabels)+1):
             for c in range(len(btnLabels[0])):
-                self.btn.append(ttk.Button(self.frame, text=btnLabels[r-1][c]))
+                self.btn.append(ttk.Button(self.frame, text=btnLabels[r-1][c], style='big.TButton'))
                 self.btn[len(self.btn)-1].grid(row=r, column=c, padx=2, pady=2)
                 self.btn[len(self.btn)-1].configure(command=lambda text=btnLabels[r-1][c]:self.click(text))
         self.root.mainloop()
 
     def info(self):
-        messagebox.showinfo(_("menu2.1"), ("pyCalc v."+self.version+"\nGNU AGPL v.3.0\nhttps://github.com/Programista3/pyCalc"))
+        messagebox.showinfo(_("menu3.1"), ("pyCalc v."+self.version+"\nGNU AGPL v.3.0\nhttps://github.com/Programista3/pyCalc"))
+
+    def calcScreenSizeDiagonal(self, diagonal, ratio):
+        result = ((ratio[0]**2+ratio[1]**2)**0.5)/float(diagonal)
+        return (round(ratio[0]/result,2), round(ratio[1]/result,2))
+
+    def calcScreenSizeWidth(self, width, ratio):
+        height = round(width*ratio[1]/ratio[0],2)
+        diagonal = round((width**2+height**2)**0.5,2)
+        return (height, diagonal)
+
+    def calcScreenSizeHeight(self, height, ratio):
+        width = round(height*ratio[0]/ratio[1],2)
+        diagonal = round((width**2+height**2)**0.5,2)
+        return (width, diagonal)
+
+    def clearScreenSizeForm(self):
+        for i in range(0,6):
+            self.number[i].delete(0, END)
+
+    def calcScreenSize(self, index):
+        if(index != None):
+            ratio = list(map(int, self.combobox.get().split(':')))
+            if(index == 0):
+                if(self.isNumner(self.number[0].get())):
+                    result = self.calcScreenSizeDiagonal(float(self.number[0].get()), ratio)
+                    for i in range(1,6):
+                        self.number[i].delete(0, END)
+                    self.number[1].insert(0, result[0])
+                    self.number[2].insert(0, result[1])
+                    self.number[3].insert(0, round(float(self.number[0].get())*2.54,2))
+                    self.number[4].insert(0, round(result[0]*2.54,2))
+                    self.number[5].insert(0, round(result[1]*2.54,2))
+            elif(index == 1):
+                if(self.isNumner(self.number[1].get())):
+                    result = self.calcScreenSizeWidth(float(self.number[1].get()), ratio)
+                    for i in [0,2,3,4,5]:
+                        self.number[i].delete(0, END)
+                    self.number[0].insert(0, result[1])
+                    self.number[2].insert(0, result[0])
+                    self.number[3].insert(0, round(result[1]*2.54,2))
+                    self.number[4].insert(0, round(float(self.number[1].get())*2.54,2))
+                    self.number[5].insert(0, round(result[0]*2.54,2))
+            elif(index == 2):
+                if(self.isNumner(self.number[2].get())):
+                    result = self.calcScreenSizeHeight(float(self.number[2].get()), ratio)
+                    for i in [0,1,3,4,5]:
+                        self.number[i].delete(0, END)
+                    self.number[0].insert(0, result[1])
+                    self.number[1].insert(0, result[0])
+                    self.number[3].insert(0, round(result[1]*2.54,2))
+                    self.number[4].insert(0, round(result[0]*2.54,2))
+                    self.number[5].insert(0, round(float(self.number[2].get())*2.54,2))
+            elif(index == 3):
+                if(self.isNumner(self.number[3].get())):
+                    result = self.calcScreenSizeDiagonal(self.number[3].get(), ratio)
+                    for i in [0,1,2,4,5]:
+                        self.number[i].delete(0, END)
+                    self.number[0].insert(0, round(float(self.number[3].get())/2.54,2))
+                    self.number[1].insert(0, round(result[0]/2.54,2))
+                    self.number[2].insert(0, round(result[1]/2.54,2))
+                    self.number[4].insert(0, round(result[0],2))
+                    self.number[5].insert(0, round(result[1],2))
+            elif(index == 4):
+                if(self.isNumner(self.number[4].get())):
+                    result = self.calcScreenSizeWidth(float(self.number[4].get()), ratio)
+                    for i in [0,1,2,3,5]:
+                        self.number[i].delete(0, END)
+                    self.number[0].insert(0, round(result[1]/2.54,2))
+                    self.number[1].insert(0, round(float(self.number[4].get())/2.54,2))
+                    self.number[2].insert(0, round(result[0]/2.54,2))
+                    self.number[3].insert(0, result[1])
+                    self.number[5].insert(0, result[0])
+            elif(index == 5):
+                if(self.isNumner(self.number[5].get())):
+                    result = self.calcScreenSizeHeight(float(self.number[5].get()), ratio)
+                    for i in [0,1,2,3,4]:
+                        self.number[i].delete(0, END)
+                    self.number[0].insert(0, round(result[1]/2.54,2))
+                    self.number[1].insert(0, round(result[0]/2.54,2))
+                    self.number[2].insert(0, round(float(self.number[5].get())/2.54,2))
+                    self.number[3].insert(0, result[1])
+                    self.number[4].insert(0, result[0])
+
+    def screenSizeActiveEntry(self, index):
+        self.ssActiveEntry = index
+
+    def screenSize(self):
+        self.ssActiveEntry = None
+        window = Toplevel(self.root)
+        window.title(_("screenSizeTitle"))
+        window.iconbitmap('pycalc.ico')
+        frame = ttk.Frame(window)
+        frame.bind("<Button>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+        frame.focus_set()
+        frame.grid(row=0, column=0, rowspan=3, columnspan=5, padx=30, pady=20)
+        boxVal = StringVar()
+        ratio = ['16:9','16:10','4:3','3:2','5:4','21:9','2:1']
+        self.combobox = ttk.Combobox(frame, values=ratio, width=12)
+        self.combobox.current(0)
+        self.combobox.grid(row=0, column=1, columnspan=4)
+        text = [_('ratio'), _('diagonal'), _('width'), _('height')]
+        label = []
+        self.number = []
+        for i in range(4):
+            label.append(ttk.Label(frame, text=text[i]))
+            label[i].grid(row=i, column=0, pady=5)
+        for i in range(1,4):
+            self.number.append(ttk.Entry(frame, width=6))
+            self.number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
+            self.number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.number[i-1].grid(row=i, column=1, padx=(10, 0))
+        for i in range(4,7):
+            label.append(ttk.Label(frame, text=_("inch")))
+            label[i].grid(row=i-3, column=2)
+        for i in range(4,7):
+            self.number.append(ttk.Entry(frame, width=6))
+            self.number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
+            self.number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.number[i-1].grid(row=i-3, column=3, padx=(10,0))
+        for i in range(7,10):
+            label.append(ttk.Label(frame, text="cm"))
+            label[i].grid(row=i-6, column=4)
+        buttonCalc = ttk.Button(frame, text=_("calculate"), command=lambda: self.calcScreenSize(self.ssActiveEntry))
+        buttonCalc.grid(row=4, column=0, columnspan=2, pady=(10,0))
+        buttonReset = ttk.Button(frame, text=_("clear"), command=self.clearScreenSizeForm)
+        buttonReset.grid(row=4, column=2, columnspan=2, pady=(10,0))
 
     def changeTheme(self, theme):
         self.style.theme_use(theme)
@@ -144,10 +273,12 @@ class pyCalc:
                 elif(btn in [',','.','+','-','*','/','^']):
                     self.textbox['text'] += btn
             elif(self.textbox['text'][-1:] == '0' and self.textbox['text'][-2:][0] in ['+','-','*','/','^']):
-                self.textbox['text'] = self.textbox['text'][:-1]+btn
+                self.textbox['text'] = self.textbox['text']+btn
             elif(self.textbox['text'][-1:].isdigit()):
                 if(btn in [',','.','+','-','*','/','^',')','%','‰'] or btn.isdigit()):
                     self.textbox['text'] += btn
+                elif(btn == '('):
+                    self.textbox['text'] += '*('
             elif(self.textbox['text'][-1:] == ')'):
                 if(btn in ['+','-','*','/','^']):
                     self.textbox['text'] += btn

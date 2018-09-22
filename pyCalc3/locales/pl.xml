@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lang code="pl">
     <translation text="menu1">Funkcje</translation>
+    <translation text="menu1.1">Wymiary ekranu</translation>
     <translation text="menu2">Opcje</translation>
     <translation text="menu2.1">Język</translation>
     <translation text="menu2.2">Motyw</translation>
@@ -10,4 +11,12 @@
     <translation text="menu3.1">pyCalc - Informacje</translation>
     <translation text="error">Błąd</translation>
     <translation text="err1">Nie można dzielić przez zero</translation>
+    <translation text="screenSizeTitle">Wymiary ekranu</translation>
+    <translation text="ratio">Proporcje:</translation>
+    <translation text="diagonal">Przekątna:</translation>
+    <translation text="width">Szerokość:</translation>
+    <translation text="height">Wysokość:</translation>
+    <translation text="inch">cali</translation>
+    <translation text="calculate">Oblicz</translation>
+    <translation text="clear">Wyczyść</translation>
 </lang>
