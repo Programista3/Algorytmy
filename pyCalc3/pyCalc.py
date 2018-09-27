@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
 import os
+import math
 import lang
 _ = lang.get
 
@@ -32,7 +33,7 @@ class Stack:
 class pyCalc:
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
-        self.version = "3.1.2"
+        self.version = "3.1.3"
         self.languages = ['pl','en']
         self.lang = "pl"
         self.startGui()
@@ -80,6 +81,7 @@ class pyCalc:
         menuOptions.add_cascade(label=_("menu2.2"), menu=menuTheme)
         menuHelp.add_command(label=_("menu3.1"), command=self.info)
         menuFunctions.add_command(label=_("menu1.1"), command=self.screenSize)
+        menuFunctions.add_command(label=_("menu1.2"), command=self.trigonometricFunc)
 
         menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
         menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
@@ -122,71 +124,111 @@ class pyCalc:
 
     def clearScreenSizeForm(self):
         for i in range(0,6):
-            self.number[i].delete(0, END)
+            self.SS_number[i].delete(0, END)
+
+    def trigonometricFunc(self):
+        window = Toplevel(self.root)
+        window.title(_("menu1.2"))
+        window.iconbitmap('pycalc.ico')
+        frame = ttk.Frame(window)
+        frame.grid(row=0, column=0, rowspan=3, columnspan=2, padx=30, pady=20)
+        text = [_("function"),_("value"),_("unit")]
+        functions = ['sin','cos','tg','ctg']
+        units = [_("degree"),_("radian")]
+        labels = []
+        for i in range(3):
+            labels.append(ttk.Label(frame, text=text[i]))
+            labels[i].grid(row=i, column=0, pady=5, padx=8)
+        funcCBox = ttk.Combobox(frame, values=functions, width=8)
+        funcCBox.current(0)
+        funcCBox.grid(row=0, column=1)
+        self.TF_value = ttk.Entry(frame, width=11)
+        self.TF_value.grid(row=1, column=1)
+        unitCBox = ttk.Combobox(frame, values=units, width=8)
+        unitCBox.current(0)
+        unitCBox.grid(row=2, column=1)
+        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),self.TF_value.get()))
+        submit.grid(row=3, column=0, columnspan=2, pady=(10,0))
+
+    def calcTrigonometricFunc(self, function, unit, value):
+        if(value.isdigit()):
+            value = int(value)
+            if(unit == 0):
+                value = math.radians(value)
+            if(function == 'sin'):
+                value = math.sin(value)
+            elif(function == 'cos'):
+                value = math.cos(value)
+            elif(function == 'tg'):
+                value = math.tan(value)
+            elif(function == 'ctg'):
+                value = 1/math.tan(value)
+            self.TF_value.delete(0, END)
+            self.TF_value.insert(0, round(value,9))
 
     def calcScreenSize(self, index):
         if(index != None):
-            ratio = list(map(int, self.combobox.get().split(':')))
+            ratio = list(map(int, self.SS_combobox.get().split(':')))
             if(index == 0):
-                if(self.isNumner(self.number[0].get())):
-                    result = self.calcScreenSizeDiagonal(float(self.number[0].get()), ratio)
+                if(self.isNumner(self.SS_number[0].get())):
+                    result = self.calcScreenSizeDiagonal(float(self.SS_number[0].get()), ratio)
                     for i in range(1,6):
-                        self.number[i].delete(0, END)
-                    self.number[1].insert(0, result[0])
-                    self.number[2].insert(0, result[1])
-                    self.number[3].insert(0, round(float(self.number[0].get())*2.54,2))
-                    self.number[4].insert(0, round(result[0]*2.54,2))
-                    self.number[5].insert(0, round(result[1]*2.54,2))
+                        self.SS_number[i].delete(0, END)
+                    self.SS_number[1].insert(0, result[0])
+                    self.SS_number[2].insert(0, result[1])
+                    self.SS_number[3].insert(0, round(float(self.SS_number[0].get())*2.54,2))
+                    self.SS_number[4].insert(0, round(result[0]*2.54,2))
+                    self.SS_number[5].insert(0, round(result[1]*2.54,2))
             elif(index == 1):
-                if(self.isNumner(self.number[1].get())):
-                    result = self.calcScreenSizeWidth(float(self.number[1].get()), ratio)
+                if(self.isNumner(self.SS_number[1].get())):
+                    result = self.calcScreenSizeWidth(float(self.SS_number[1].get()), ratio)
                     for i in [0,2,3,4,5]:
-                        self.number[i].delete(0, END)
-                    self.number[0].insert(0, result[1])
-                    self.number[2].insert(0, result[0])
-                    self.number[3].insert(0, round(result[1]*2.54,2))
-                    self.number[4].insert(0, round(float(self.number[1].get())*2.54,2))
-                    self.number[5].insert(0, round(result[0]*2.54,2))
+                        self.SS_number[i].delete(0, END)
+                    self.SS_number[0].insert(0, result[1])
+                    self.SS_number[2].insert(0, result[0])
+                    self.SS_number[3].insert(0, round(result[1]*2.54,2))
+                    self.SS_number[4].insert(0, round(float(self.SS_number[1].get())*2.54,2))
+                    self.SS_number[5].insert(0, round(result[0]*2.54,2))
             elif(index == 2):
-                if(self.isNumner(self.number[2].get())):
-                    result = self.calcScreenSizeHeight(float(self.number[2].get()), ratio)
+                if(self.isNumner(self.SS_number[2].get())):
+                    result = self.calcScreenSizeHeight(float(self.SS_number[2].get()), ratio)
                     for i in [0,1,3,4,5]:
-                        self.number[i].delete(0, END)
-                    self.number[0].insert(0, result[1])
-                    self.number[1].insert(0, result[0])
-                    self.number[3].insert(0, round(result[1]*2.54,2))
-                    self.number[4].insert(0, round(result[0]*2.54,2))
-                    self.number[5].insert(0, round(float(self.number[2].get())*2.54,2))
+                        self.SS_number[i].delete(0, END)
+                    self.SS_number[0].insert(0, result[1])
+                    self.SS_number[1].insert(0, result[0])
+                    self.SS_number[3].insert(0, round(result[1]*2.54,2))
+                    self.SS_number[4].insert(0, round(result[0]*2.54,2))
+                    self.SS_number[5].insert(0, round(float(self.SS_number[2].get())*2.54,2))
             elif(index == 3):
-                if(self.isNumner(self.number[3].get())):
-                    result = self.calcScreenSizeDiagonal(self.number[3].get(), ratio)
+                if(self.isNumner(self.SS_number[3].get())):
+                    result = self.calcScreenSizeDiagonal(self.SS_number[3].get(), ratio)
                     for i in [0,1,2,4,5]:
-                        self.number[i].delete(0, END)
-                    self.number[0].insert(0, round(float(self.number[3].get())/2.54,2))
-                    self.number[1].insert(0, round(result[0]/2.54,2))
-                    self.number[2].insert(0, round(result[1]/2.54,2))
-                    self.number[4].insert(0, round(result[0],2))
-                    self.number[5].insert(0, round(result[1],2))
+                        self.SS_number[i].delete(0, END)
+                    self.SS_number[0].insert(0, round(float(self.SS_number[3].get())/2.54,2))
+                    self.SS_number[1].insert(0, round(result[0]/2.54,2))
+                    self.SS_number[2].insert(0, round(result[1]/2.54,2))
+                    self.SS_number[4].insert(0, round(result[0],2))
+                    self.SS_number[5].insert(0, round(result[1],2))
             elif(index == 4):
-                if(self.isNumner(self.number[4].get())):
-                    result = self.calcScreenSizeWidth(float(self.number[4].get()), ratio)
+                if(self.isNumner(self.SS_number[4].get())):
+                    result = self.calcScreenSizeWidth(float(self.SS_number[4].get()), ratio)
                     for i in [0,1,2,3,5]:
-                        self.number[i].delete(0, END)
-                    self.number[0].insert(0, round(result[1]/2.54,2))
-                    self.number[1].insert(0, round(float(self.number[4].get())/2.54,2))
-                    self.number[2].insert(0, round(result[0]/2.54,2))
-                    self.number[3].insert(0, result[1])
-                    self.number[5].insert(0, result[0])
+                        self.SS_number[i].delete(0, END)
+                    self.SS_number[0].insert(0, round(result[1]/2.54,2))
+                    self.SS_number[1].insert(0, round(float(self.SS_number[4].get())/2.54,2))
+                    self.SS_number[2].insert(0, round(result[0]/2.54,2))
+                    self.SS_number[3].insert(0, result[1])
+                    self.SS_number[5].insert(0, result[0])
             elif(index == 5):
-                if(self.isNumner(self.number[5].get())):
-                    result = self.calcScreenSizeHeight(float(self.number[5].get()), ratio)
+                if(self.isNumner(self.SS_number[5].get())):
+                    result = self.calcScreenSizeHeight(float(self.SS_number[5].get()), ratio)
                     for i in [0,1,2,3,4]:
-                        self.number[i].delete(0, END)
-                    self.number[0].insert(0, round(result[1]/2.54,2))
-                    self.number[1].insert(0, round(result[0]/2.54,2))
-                    self.number[2].insert(0, round(float(self.number[5].get())/2.54,2))
-                    self.number[3].insert(0, result[1])
-                    self.number[4].insert(0, result[0])
+                        self.SS_number[i].delete(0, END)
+                    self.SS_number[0].insert(0, round(result[1]/2.54,2))
+                    self.SS_number[1].insert(0, round(result[0]/2.54,2))
+                    self.SS_number[2].insert(0, round(float(self.SS_number[5].get())/2.54,2))
+                    self.SS_number[3].insert(0, result[1])
+                    self.SS_number[4].insert(0, result[0])
 
     def screenSizeActiveEntry(self, index):
         self.ssActiveEntry = index
@@ -194,38 +236,37 @@ class pyCalc:
     def screenSize(self):
         self.ssActiveEntry = None
         window = Toplevel(self.root)
-        window.title(_("screenSizeTitle"))
+        window.title(_("menu1.1"))
         window.iconbitmap('pycalc.ico')
         frame = ttk.Frame(window)
         frame.bind("<Button>", lambda event: self.calcScreenSize(self.ssActiveEntry))
         frame.focus_set()
         frame.grid(row=0, column=0, rowspan=3, columnspan=5, padx=30, pady=20)
-        boxVal = StringVar()
         ratio = ['16:9','16:10','4:3','3:2','5:4','21:9','2:1']
-        self.combobox = ttk.Combobox(frame, values=ratio, width=12)
-        self.combobox.current(0)
-        self.combobox.grid(row=0, column=1, columnspan=4)
+        self.SS_combobox = ttk.Combobox(frame, values=ratio, width=12)
+        self.SS_combobox.current(0)
+        self.SS_combobox.grid(row=0, column=1, columnspan=4)
         text = [_('ratio'), _('diagonal'), _('width'), _('height')]
         label = []
-        self.number = []
+        self.SS_number = []
         for i in range(4):
             label.append(ttk.Label(frame, text=text[i]))
             label[i].grid(row=i, column=0, pady=5)
         for i in range(1,4):
-            self.number.append(ttk.Entry(frame, width=6))
-            self.number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
-            self.number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.number[i-1].grid(row=i, column=1, padx=(10, 0))
+            self.SS_number.append(ttk.Entry(frame, width=6))
+            self.SS_number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
+            self.SS_number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.SS_number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.SS_number[i-1].grid(row=i, column=1, padx=(10, 0))
         for i in range(4,7):
             label.append(ttk.Label(frame, text=_("inch")))
             label[i].grid(row=i-3, column=2)
         for i in range(4,7):
-            self.number.append(ttk.Entry(frame, width=6))
-            self.number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
-            self.number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.number[i-1].grid(row=i-3, column=3, padx=(10,0))
+            self.SS_number.append(ttk.Entry(frame, width=6))
+            self.SS_number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
+            self.SS_number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.SS_number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.SS_number[i-1].grid(row=i-3, column=3, padx=(10,0))
         for i in range(7,10):
             label.append(ttk.Label(frame, text="cm"))
             label[i].grid(row=i-6, column=4)
