@@ -2,6 +2,7 @@
 from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
+import re
 import os
 import math
 import lang
@@ -33,7 +34,7 @@ class Stack:
 class pyCalc:
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
-        self.version = "3.1.3"
+        self.version = "3.1.4"
         self.languages = ['pl','en']
         self.lang = "pl"
         self.startGui()
@@ -82,6 +83,7 @@ class pyCalc:
         menuHelp.add_command(label=_("menu3.1"), command=self.info)
         menuFunctions.add_command(label=_("menu1.1"), command=self.screenSize)
         menuFunctions.add_command(label=_("menu1.2"), command=self.trigonometricFunc)
+        menuFunctions.add_command(label=_("menu1.3"), command=self.numberSystems)
 
         menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
         menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
@@ -126,12 +128,87 @@ class pyCalc:
         for i in range(0,6):
             self.SS_number[i].delete(0, END)
 
+    def numberSystems(self):
+        window = Toplevel(self.root)
+        window.title(_("menu1.3"))
+        window.iconbitmap('pycalc.ico')
+        frame = ttk.Frame(window)
+        frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=30, pady=20)
+        text = [_("number"),_("inputSystem"),_("targetSystem"),_("result")]
+        systems = [_("2ns"),_("8ns"),_("10ns"),_("16ns")]
+        labels = []
+        for i in range(4):
+            labels.append(ttk.Label(frame, text=text[i]))
+            labels[i].grid(row=i, column=0, pady=5, padx=8)
+        number = ttk.Entry(frame, width=14)
+        number.grid(row=0, column=1)
+        inCBox = ttk.Combobox(frame, values=systems, width=11)
+        inCBox.current(0)
+        inCBox.grid(row=1, column=1)
+        outCBox = ttk.Combobox(frame, values=systems, width=11)
+        outCBox.current(1)
+        outCBox.grid(row=2, column=1)
+        self.NS_result = ttk.Label(frame)
+        self.NS_result.grid(row=3, column=1)
+        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
+        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
+
+    def convertNumberSystem(self, number, systemIn, systemOut):
+        if(systemIn == 0):
+            if(re.match(r'^[01]+$', number)):
+                if(systemOut == 0):
+                    self.NS_result['text'] = number
+                elif(systemOut == 1):
+                    self.NS_result['text'] = str(oct(int(number,2)))[2:]
+                elif(systemOut == 2):
+                    self.NS_result['text'] = str(int(number,2))
+                elif(systemOut == 3):
+                    self.NS_result['text'] = str(hex(int(number,2)))[2:]
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+        elif(systemIn == 1):
+            if(re.match(r'^[0-7]+$', number)):
+                if(systemOut == 0):
+                    self.NS_result['text'] = str(bin(int(number,8)))[2:]
+                elif(systemOut == 1):
+                    self.NS_result['text'] = number
+                elif(systemOut == 2):
+                    self.NS_result['text'] = str(int(number,8))
+                elif(systemOut == 3):
+                    self.NS_result['text'] = str(hex(int(number,8)))[2:]
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+        elif(systemIn == 2):
+            if(re.match(r'^[0-9]+$', number)):
+                if(systemOut == 0):
+                    self.NS_result['text'] = str(bin(int(number)))[2:]
+                elif(systemOut == 1):
+                    self.NS_result['text'] = str(oct(int(number)))[2:]
+                elif(systemOut == 2):
+                    self.NS_result['text'] = number
+                elif(systemOut == 3):
+                    self.NS_result['text'] = str(hex(int(number)))[2:]
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+        elif(systemIn == 3):
+            if(re.match(r'^[0-9a-fA-F]+$', number)):
+                if(systemOut == 0):
+                    self.NS_result['text'] = str(bin(int(number,16)))[2:]
+                elif(systemOut == 1):
+                    self.NS_result['text'] = str(oct(int(number,16)))[2:]
+                elif(systemOut == 2):
+                    self.NS_result['text'] = str(int(number,16))
+                elif(systemOut == 3):
+                    self.NS_result['text'] = number
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+
     def trigonometricFunc(self):
         window = Toplevel(self.root)
         window.title(_("menu1.2"))
         window.iconbitmap('pycalc.ico')
         frame = ttk.Frame(window)
-        frame.grid(row=0, column=0, rowspan=3, columnspan=2, padx=30, pady=20)
+        frame.grid(row=0, column=0, rowspan=4, columnspan=2, padx=30, pady=20)
         text = [_("function"),_("value"),_("unit")]
         functions = ['sin','cos','tg','ctg']
         units = [_("degree"),_("radian")]
@@ -170,7 +247,7 @@ class pyCalc:
         if(index != None):
             ratio = list(map(int, self.SS_combobox.get().split(':')))
             if(index == 0):
-                if(self.isNumner(self.SS_number[0].get())):
+                if(self.isNumber(self.SS_number[0].get())):
                     result = self.calcScreenSizeDiagonal(float(self.SS_number[0].get()), ratio)
                     for i in range(1,6):
                         self.SS_number[i].delete(0, END)
@@ -180,7 +257,7 @@ class pyCalc:
                     self.SS_number[4].insert(0, round(result[0]*2.54,2))
                     self.SS_number[5].insert(0, round(result[1]*2.54,2))
             elif(index == 1):
-                if(self.isNumner(self.SS_number[1].get())):
+                if(self.isNumber(self.SS_number[1].get())):
                     result = self.calcScreenSizeWidth(float(self.SS_number[1].get()), ratio)
                     for i in [0,2,3,4,5]:
                         self.SS_number[i].delete(0, END)
@@ -190,7 +267,7 @@ class pyCalc:
                     self.SS_number[4].insert(0, round(float(self.SS_number[1].get())*2.54,2))
                     self.SS_number[5].insert(0, round(result[0]*2.54,2))
             elif(index == 2):
-                if(self.isNumner(self.SS_number[2].get())):
+                if(self.isNumber(self.SS_number[2].get())):
                     result = self.calcScreenSizeHeight(float(self.SS_number[2].get()), ratio)
                     for i in [0,1,3,4,5]:
                         self.SS_number[i].delete(0, END)
@@ -200,7 +277,7 @@ class pyCalc:
                     self.SS_number[4].insert(0, round(result[0]*2.54,2))
                     self.SS_number[5].insert(0, round(float(self.SS_number[2].get())*2.54,2))
             elif(index == 3):
-                if(self.isNumner(self.SS_number[3].get())):
+                if(self.isNumber(self.SS_number[3].get())):
                     result = self.calcScreenSizeDiagonal(self.SS_number[3].get(), ratio)
                     for i in [0,1,2,4,5]:
                         self.SS_number[i].delete(0, END)
@@ -210,7 +287,7 @@ class pyCalc:
                     self.SS_number[4].insert(0, round(result[0],2))
                     self.SS_number[5].insert(0, round(result[1],2))
             elif(index == 4):
-                if(self.isNumner(self.SS_number[4].get())):
+                if(self.isNumber(self.SS_number[4].get())):
                     result = self.calcScreenSizeWidth(float(self.SS_number[4].get()), ratio)
                     for i in [0,1,2,3,5]:
                         self.SS_number[i].delete(0, END)
@@ -220,7 +297,7 @@ class pyCalc:
                     self.SS_number[3].insert(0, result[1])
                     self.SS_number[5].insert(0, result[0])
             elif(index == 5):
-                if(self.isNumner(self.SS_number[5].get())):
+                if(self.isNumber(self.SS_number[5].get())):
                     result = self.calcScreenSizeHeight(float(self.SS_number[5].get()), ratio)
                     for i in [0,1,2,3,4]:
                         self.SS_number[i].delete(0, END)
@@ -339,7 +416,7 @@ class pyCalc:
     def isFunction(self, char):
         return char in ['%','‰']
 
-    def isNumner(self, str):
+    def isNumber(self, str):
         if(str.isdigit()):
             return 1
         else:
@@ -416,9 +493,9 @@ class pyCalc:
         stack = Stack()
         output = []
         for c in rpn:
-            if(self.isNumner(c) == 1):
+            if(self.isNumber(c) == 1):
                 stack.push(int(c))
-            elif(self.isNumner(c) == 2):
+            elif(self.isNumber(c) == 2):
                 stack.push(float(c))
             elif(self.isFunction(c)):
                 a = stack.top()

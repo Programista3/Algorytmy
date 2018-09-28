@@ -3,6 +3,7 @@
     <translation text="menu1">Functions</translation>
     <translation text="menu1.1">Screen Size</translation>
     <translation text="menu1.2">Trigonometric Functions</translation>
+    <translation text="menu1.3">Number systems</translation>
     <translation text="menu2">Options</translation>
     <translation text="menu2.1">Language</translation>
     <translation text="menu2.2">Theme</translation>
@@ -12,6 +13,7 @@
     <translation text="menu3.1">pyCalc - Informations</translation>
     <translation text="error">Error</translation>
     <translation text="err1">Cannot divide by zero!</translation>
+    <translation text="err2">Incorrect number</translation>
     <translation text="ratio">Aspect Ratio:</translation>
     <translation text="diagonal">Diagonal:</translation>
     <translation text="width">Width:</translation>
@@ -24,4 +26,12 @@
     <translation text="unit">Unit:</translation>
     <translation text="degree">degrees</translation>
     <translation text="radian">radians</translation>
+    <translation text="inputSystem">Input system:</translation>
+    <translation text="targetSystem">Target system:</translation>
+    <translation text="2ns">binary</translation>
+    <translation text="8ns">octal</translation>
+    <translation text="10ns">decimal</translation>
+    <translation text="16ns">hexa decimal</translation>
+    <translation text="number">Number:</translation>
+    <translation text="result">Result:</translation>
 </lang>
