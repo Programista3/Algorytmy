@@ -1,7 +1,14 @@
 # pyCalc
-Calculator made in Python using `tkinter`<br><br>
-## pyCalc 3.x.x
-New version of the calculator that uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)
-## pyCalc 2.x.x
-Old version of the calculator that uses [Regular Expressions](https://en.wikipedia.org/wiki/Regular_expression)<br><br>
-Code tested in Windows 10 with Python 3.7.0
+Calculator made in Python using `tkinter`  
+pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)<br><br>
+![screen](https://github.com/Programista3/pyCalc/blob/dcd5a063105637873e684d9569825e9b1dc22559/images/pyCalc3.png?raw=true)
+## Functions
+- Basic calculator
+- Screen size calculator
+- Trigonometric function calculator
+- Number system converter
+## Source
+### Requirements
+- [pyLang](https://github.com/Programista3/pyLang)
+
+<br>Code tested in Windows 10 with Python 3.6.6
