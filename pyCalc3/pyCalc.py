@@ -34,7 +34,7 @@ class Stack:
 class pyCalc:
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
-        self.version = "3.1.4"
+        self.version = "3.1.5"
         self.languages = ['pl','en']
         self.lang = "pl"
         self.startGui()
@@ -92,18 +92,21 @@ class pyCalc:
 
         self.frame = ttk.Frame(self.root)
         self.frame.grid(row=0, column=0, rowspan=len(btnLabels)+1, columnspan=len(btnLabels[0]))
-        self.textbox = ttk.Label(self.frame, text="0", font=('Helvetica', '18'), anchor="e")
+        self.textbox = ttk.Label(self.frame, text="0", font=('Helvetica', '19'), anchor="e")
         self.root.bind("<Return>", lambda event: self.click("="))
         self.root.bind("<BackSpace>", lambda event: self.click("AC"))
         self.root.bind("<Delete>", lambda event: self.click("C"))
         self.root.bind("<Key>", lambda event: self.click(event.char))
         self.root.config(menu=menu)
-        self.textbox.grid(row=0, columnspan=len(btnLabels[0]), sticky=W+E, padx=3, pady=3)
+        self.textbox.grid(row=0, columnspan=len(btnLabels[0]), sticky=W+E, padx=5, pady=0)
+        self.resultPreview = ttk.Label(self.frame, text="0", anchor="e")
+        self.resultPreview.grid(row=1, columnspan=len(btnLabels[0]), sticky=W+E, padx=5, pady=0)
+        #self.resultPreview.grid_forget()
         self.btn = []
         for r in range(1,len(btnLabels)+1):
             for c in range(len(btnLabels[0])):
                 self.btn.append(ttk.Button(self.frame, text=btnLabels[r-1][c], style='big.TButton'))
-                self.btn[len(self.btn)-1].grid(row=r, column=c, padx=2, pady=2)
+                self.btn[len(self.btn)-1].grid(row=r+1, column=c, padx=2, pady=2)
                 self.btn[len(self.btn)-1].configure(command=lambda text=btnLabels[r-1][c]:self.click(text))
         self.root.mainloop()
 
@@ -156,76 +159,62 @@ class pyCalc:
     def convertNumberSystem(self, number, systemIn, systemOut):
         if(systemIn == 0):
             if(re.match(r'^[01]+$', number)):
-                if(systemOut == 0):
-                    self.NS_result['text'] = number
-                elif(systemOut == 1):
-                    self.NS_result['text'] = str(oct(int(number,2)))[2:]
-                elif(systemOut == 2):
-                    self.NS_result['text'] = str(int(number,2))
-                elif(systemOut == 3):
-                    self.NS_result['text'] = str(hex(int(number,2)))[2:]
+                number = int(number,2)
             else:
                 messagebox.showerror(_("error"), _("err2"))
+                return
         elif(systemIn == 1):
             if(re.match(r'^[0-7]+$', number)):
-                if(systemOut == 0):
-                    self.NS_result['text'] = str(bin(int(number,8)))[2:]
-                elif(systemOut == 1):
-                    self.NS_result['text'] = number
-                elif(systemOut == 2):
-                    self.NS_result['text'] = str(int(number,8))
-                elif(systemOut == 3):
-                    self.NS_result['text'] = str(hex(int(number,8)))[2:]
+                number = int(number,8)
             else:
                 messagebox.showerror(_("error"), _("err2"))
+                return
         elif(systemIn == 2):
             if(re.match(r'^[0-9]+$', number)):
-                if(systemOut == 0):
-                    self.NS_result['text'] = str(bin(int(number)))[2:]
-                elif(systemOut == 1):
-                    self.NS_result['text'] = str(oct(int(number)))[2:]
-                elif(systemOut == 2):
-                    self.NS_result['text'] = number
-                elif(systemOut == 3):
-                    self.NS_result['text'] = str(hex(int(number)))[2:]
+                number = int(number)
             else:
                 messagebox.showerror(_("error"), _("err2"))
+                return
         elif(systemIn == 3):
             if(re.match(r'^[0-9a-fA-F]+$', number)):
-                if(systemOut == 0):
-                    self.NS_result['text'] = str(bin(int(number,16)))[2:]
-                elif(systemOut == 1):
-                    self.NS_result['text'] = str(oct(int(number,16)))[2:]
-                elif(systemOut == 2):
-                    self.NS_result['text'] = str(int(number,16))
-                elif(systemOut == 3):
-                    self.NS_result['text'] = number
+                number = int(number,16)
             else:
                 messagebox.showerror(_("error"), _("err2"))
+                return
+        if(systemOut == 0):
+            self.NS_result['text'] = str(bin(number))[2:]
+        elif(systemOut == 1):
+            self.NS_result['text'] = str(oct(number))[2:]
+        elif(systemOut == 2):
+            self.NS_result['text'] = str(number)
+        elif(systemOut == 3):
+            self.NS_result['text'] = str(hex(number))[2:]
 
     def trigonometricFunc(self):
         window = Toplevel(self.root)
         window.title(_("menu1.2"))
         window.iconbitmap('pycalc.ico')
         frame = ttk.Frame(window)
-        frame.grid(row=0, column=0, rowspan=4, columnspan=2, padx=30, pady=20)
-        text = [_("function"),_("value"),_("unit")]
+        frame.grid(row=0, column=0, rowspan=5, columnspan=2, padx=30, pady=20)
+        text = [_("function"),_("value"),_("unit"),_("result")]
         functions = ['sin','cos','tg','ctg']
         units = [_("degree"),_("radian")]
         labels = []
-        for i in range(3):
+        for i in range(4):
             labels.append(ttk.Label(frame, text=text[i]))
             labels[i].grid(row=i, column=0, pady=5, padx=8)
         funcCBox = ttk.Combobox(frame, values=functions, width=8)
         funcCBox.current(0)
         funcCBox.grid(row=0, column=1)
-        self.TF_value = ttk.Entry(frame, width=11)
-        self.TF_value.grid(row=1, column=1)
+        value = ttk.Entry(frame, width=11)
+        value.grid(row=1, column=1)
         unitCBox = ttk.Combobox(frame, values=units, width=8)
         unitCBox.current(0)
         unitCBox.grid(row=2, column=1)
-        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),self.TF_value.get()))
-        submit.grid(row=3, column=0, columnspan=2, pady=(10,0))
+        self.TF_result = ttk.Label(frame)
+        self.TF_result.grid(row=3, column=1)
+        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
+        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
 
     def calcTrigonometricFunc(self, function, unit, value):
         if(value.isdigit()):
@@ -240,8 +229,7 @@ class pyCalc:
                 value = math.tan(value)
             elif(function == 'ctg'):
                 value = 1/math.tan(value)
-            self.TF_value.delete(0, END)
-            self.TF_value.insert(0, round(value,9))
+            self.TF_result['text'] = str(round(value,10))
 
     def calcScreenSize(self, index):
         if(index != None):
@@ -371,20 +359,31 @@ class pyCalc:
         if(btn == '='):
             result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
             self.textbox['text'] = str(result)
+            self.resultPreview['text'] = "0"
         elif(btn == 'C'):
             self.textbox['text'] = "0"
+            self.resultPreview['text'] = "0"
         elif(btn == 'AC'):
             if(len(self.textbox['text']) > 1):
                 self.textbox['text'] = self.textbox['text'][:-1]
+                if(self.textbox['text'][-1:].isdigit()):
+                    result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
+                    self.resultPreview['text'] = result
             else:
                 self.textbox['text'] = "0"
+                self.resultPreview['text'] = "0"
         elif(btn == 'ᵪ²'):
             if(self.textbox['text'][-1:].isdigit()):
                 self.textbox['text'] += '^2'
+                result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
+                self.resultPreview['text'] = result
         elif(btn == 'ᵪʸ'):
             if(self.textbox['text'][-1:].isdigit()):
                 self.textbox['text'] += '^'
         elif(btn in self.chars):
+            if(btn.isdigit() or btn in ['%','‰']):
+                result = self.calculateRPN(self.convertToRPN(self.textbox['text']+btn))
+                self.resultPreview['text'] = result
             if(self.textbox['text'] == "0"):
                 if(btn in ['1','2','3','4','5','6','7','8','9','(','-','√']):
                     self.textbox['text'] = btn
@@ -393,13 +392,19 @@ class pyCalc:
             elif(self.textbox['text'][-1:] == '0' and self.textbox['text'][-2:][0] in ['+','-','*','/','^']):
                 self.textbox['text'] = self.textbox['text']+btn
             elif(self.textbox['text'][-1:].isdigit()):
-                if(btn in [',','.','+','-','*','/','^',')','%','‰'] or btn.isdigit()):
+                if(btn in [',','.','+','-','*','/','^','%','‰'] or btn.isdigit()):
                     self.textbox['text'] += btn
                 elif(btn == '('):
                     self.textbox['text'] += '*('
+                elif(btn == ')'):
+                    if(self.textbox['text'].count('(') > self.textbox['text'].count(')')):
+                        self.textbox['text'] += ')'
             elif(self.textbox['text'][-1:] == ')'):
                 if(btn in ['+','-','*','/','^']):
                     self.textbox['text'] += btn
+                elif(btn == ')'):
+                    if(self.textbox['text'].count('(') > self.textbox['text'].count(')')):
+                        self.textbox['text'] += ')'
             elif(self.textbox['text'][-1:] in ['+','-','*','/','^']):
                 if(btn.isdigit() or btn in ['√','(','-']):
                     self.textbox['text'] += btn
@@ -484,12 +489,16 @@ class pyCalc:
                 while stack.top() != '(':
                     output.append(stack.top())
                     stack.pop()
+                    if(stack.size() == 0):
+                        return 0
                 stack.pop()
                 brackets.pop()
         output.extend(stack.get())
         return output
 
     def calculateRPN(self, rpn):
+        if(rpn == 0):
+            return 0
         stack = Stack()
         output = []
         for c in rpn:
@@ -510,24 +519,27 @@ class pyCalc:
                     stack.pop()
                     stack.push(a**0.5)
                 else:
-                    a = stack.top()
-                    stack.pop()  
-                    b = stack.top()
-                    stack.pop()
-                    if(c == "+"):
-                        stack.push(b+a)
-                    elif(c == "-"):
-                        stack.push(b-a)
-                    elif(c == "*"):
-                        stack.push(b*a)
-                    elif(c == "/"):
-                        if(a != 0):
-                            stack.push(b/a)
-                        else:
-                            messagebox.showerror(_("error"), _("err1"))
-                            return 0
-                    elif(c == "^"):
-                        stack.push(b**a)
+                    if(stack.size() > 1):
+                        a = stack.top()
+                        stack.pop()  
+                        b = stack.top()
+                        stack.pop()
+                        if(c == "+"):
+                            stack.push(b+a)
+                        elif(c == "-"):
+                            stack.push(b-a)
+                        elif(c == "*"):
+                            stack.push(b*a)
+                        elif(c == "/"):
+                            if(a != 0):
+                                stack.push(b/a)
+                            else:
+                                messagebox.showerror(_("error"), _("err1"))
+                                return 0
+                        elif(c == "^"):
+                            stack.push(b**a)
+                    else:
+                        return 0
         return int(stack.top()) if float(stack.top()).is_integer() else stack.top()
 
 calc = pyCalc()
