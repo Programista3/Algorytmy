@@ -5,6 +5,7 @@ import tkinter.ttk as ttk
 import re
 import os
 import math
+from configparser import ConfigParser
 import lang
 _ = lang.get
 
@@ -34,9 +35,10 @@ class Stack:
 class pyCalc:
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
-        self.version = "3.1.5"
+        self.version = "3.1.6"
         self.languages = ['pl','en']
         self.lang = "pl"
+        self.checkSettings()
         self.startGui()
 
     def startGui(self):
@@ -54,17 +56,19 @@ class pyCalc:
             ['(',')','0','.','=']
         ]
         vTheme = StringVar(value=self.style.theme_use())
-        if(os.path.isfile('settings.dat')):
-            file = open('settings.dat')
-            text = file.read()
-            file.close()
-            if(len(text) == 2):
-                if(int(text[0]) < len(self.languages)):
-                    self.lang = self.languages[int(text[0])]
-                    lang.select(self.lang)
-                if(int(text[1]) < len(self.style.theme_names())):
-                    vTheme = StringVar(value=self.style.theme_names()[int(text[1])])
-                    self.style.theme_use(self.style.theme_names()[int(text[1])])
+        config = ConfigParser()
+        cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
+        if(os.path.isfile(cfgpath)):
+            config.read(cfgpath)
+            if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names()):
+                self.lang = config['Personalization']['language']
+                lang.select(config['Personalization']['language'])
+                vTheme = StringVar(value=config['Personalization']['theme'])
+                self.style.theme_use(config['Personalization']['theme'])
+            else:
+                self.createDefaultSettingsFile()
+        else:
+            self.createDefaultSettingsFile()
         vLang = StringVar(value=self.lang)
 
         menu = Menu(self.root)
@@ -342,16 +346,24 @@ class pyCalc:
 
     def changeTheme(self, theme):
         self.style.theme_use(theme)
-        file = open('settings.dat', 'w')
-        file.write(str(self.languages.index(self.lang))+str(self.style.theme_names().index(self.style.theme_use())))
-        file.close()
+        config = ConfigParser()
+        cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
+        config.read(cfgpath)
+        config['Personalization']['theme'] = theme
+        with open(cfgpath, 'w') as cfgfile:
+            config.write(cfgfile)
+            cfgfile.close()
 
     def selectLanguage(self, language):
         lang.select(language)
         self.lang = language
-        file = open('settings.dat', 'w')
-        file.write(str(self.languages.index(self.lang))+str(self.style.theme_names().index(self.style.theme_use())))
-        file.close()
+        config = ConfigParser()
+        cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
+        config.read(cfgpath)
+        config['Personalization']['language'] = language
+        with open(cfgpath, 'w') as cfgfile:
+            config.write(cfgfile)
+            cfgfile.close()
         self.root.destroy()
         self.startGui()
 
@@ -541,5 +553,26 @@ class pyCalc:
                     else:
                         return 0
         return int(stack.top()) if float(stack.top()).is_integer() else stack.top()
+
+    def checkSettings(self):
+        path = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc')
+        if(os.path.isdir(path)):
+            if(not os.path.isfile(os.path.join(path,'settings.ini'))):
+                self.createDefaultSettingsFile()
+        else:
+            os.makedirs(path)
+            self.createDefaultSettingsFile()
+
+    def createDefaultSettingsFile(self):
+        path = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
+        open(path, 'w+').close()
+        config = ConfigParser()
+        config.read(path)
+        config.add_section('Personalization')
+        config.set('Personalization','language','pl')
+        config.set('Personalization','theme','vista')
+        with open(path, 'w') as cfgfile:
+            config.write(cfgfile)
+            cfgfile.close()
 
 calc = pyCalc()
