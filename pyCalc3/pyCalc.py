@@ -35,9 +35,20 @@ class Stack:
 class pyCalc:
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
-        self.version = "3.1.6"
+        self.settingsTemplate = {
+            'Personalization': {
+                'language': 'pl',
+                'theme': 'vista'
+            },
+            'Settings': {
+                'resultPreview': 'true',
+                'history': 'false'
+            }
+        }
+        self.version = "3.1.7"
         self.languages = ['pl','en']
         self.lang = "pl"
+        self.end = False
         self.checkSettings()
         self.startGui()
 
@@ -48,7 +59,7 @@ class pyCalc:
         self.root.resizable(False, False)
         self.style = ttk.Style()
         self.style.configure("big.TButton", padding=(-10,10,-10,10), font=('16'))
-        btnLabels = [
+        self.btnLabels = [
             ['ᵪ²','ᵪʸ','C','AC','/'],
             ['√','7','8','9','*'],
             ['%','4','5','6','-'],
@@ -56,20 +67,31 @@ class pyCalc:
             ['(',')','0','.','=']
         ]
         vTheme = StringVar(value=self.style.theme_use())
+        vLang = StringVar(value=self.lang)
+        vShowPreview = BooleanVar(value=True)
+        vShowHistory = BooleanVar(value=False)
+
         config = ConfigParser()
         cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
         if(os.path.isfile(cfgpath)):
             config.read(cfgpath)
-            if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names()):
+            if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names() and config['Settings']['resultPreview'] in ['true','false','True','False','0','1'] and config['Settings']['history'] in ['true','false','True','False','0','1']):
                 self.lang = config['Personalization']['language']
                 lang.select(config['Personalization']['language'])
                 vTheme = StringVar(value=config['Personalization']['theme'])
                 self.style.theme_use(config['Personalization']['theme'])
+                if(config['Settings']['resultPreview'] in ['true','True','1']):
+                    vShowPreview.set(True)
+                else:
+                    vShowPreview.set(False)
+                if(config['Settings']['history'] in ['true','True','1']):
+                    vShowHistory.set(True)
+                else:
+                    vShowHistory.set(False)
             else:
                 self.createDefaultSettingsFile()
         else:
             self.createDefaultSettingsFile()
-        vLang = StringVar(value=self.lang)
 
         menu = Menu(self.root)
         menuFunctions = Menu(self.root, tearoff=0)
@@ -84,6 +106,9 @@ class pyCalc:
 
         menuOptions.add_cascade(label=_("menu2.1"), menu=menuLanguage)
         menuOptions.add_cascade(label=_("menu2.2"), menu=menuTheme)
+        menuOptions.add_separator()
+        menuOptions.add_checkbutton(label=_("menu2.3"), onvalue=True, offvalue=False, variable=vShowPreview, command=lambda: self.changeSettings('resultPreview', vShowPreview.get()))
+        menuOptions.add_checkbutton(label=_("menu2.4"), onvalue=True, offvalue=False, variable=vShowHistory, command=lambda: self.changeSettings('history', vShowHistory.get()))
         menuHelp.add_command(label=_("menu3.1"), command=self.info)
         menuFunctions.add_command(label=_("menu1.1"), command=self.screenSize)
         menuFunctions.add_command(label=_("menu1.2"), command=self.trigonometricFunc)
@@ -95,23 +120,26 @@ class pyCalc:
             menuTheme.add_radiobutton(label=i.capitalize(), var=vTheme, value=i, command=lambda th=i: self.changeTheme(th))
 
         self.frame = ttk.Frame(self.root)
-        self.frame.grid(row=0, column=0, rowspan=len(btnLabels)+1, columnspan=len(btnLabels[0]))
+        self.frame.grid(row=0, column=0, rowspan=len(self.btnLabels)+2, columnspan=len(self.btnLabels[0])+1)
         self.textbox = ttk.Label(self.frame, text="0", font=('Helvetica', '19'), anchor="e")
         self.root.bind("<Return>", lambda event: self.click("="))
         self.root.bind("<BackSpace>", lambda event: self.click("AC"))
         self.root.bind("<Delete>", lambda event: self.click("C"))
         self.root.bind("<Key>", lambda event: self.click(event.char))
         self.root.config(menu=menu)
-        self.textbox.grid(row=0, columnspan=len(btnLabels[0]), sticky=W+E, padx=5, pady=0)
+        self.textbox.grid(row=0, columnspan=len(self.btnLabels[0]), sticky=W+E, padx=5, pady=0)
         self.resultPreview = ttk.Label(self.frame, text="0", anchor="e")
-        self.resultPreview.grid(row=1, columnspan=len(btnLabels[0]), sticky=W+E, padx=5, pady=0)
-        #self.resultPreview.grid_forget()
+        if(vShowPreview.get()):
+            self.resultPreview.grid(row=1, columnspan=len(self.btnLabels[0]), sticky=W+E, padx=5, pady=0)
         self.btn = []
-        for r in range(1,len(btnLabels)+1):
-            for c in range(len(btnLabels[0])):
-                self.btn.append(ttk.Button(self.frame, text=btnLabels[r-1][c], style='big.TButton'))
+        for r in range(1,len(self.btnLabels)+1):
+            for c in range(len(self.btnLabels[0])):
+                self.btn.append(ttk.Button(self.frame, text=self.btnLabels[r-1][c], style='big.TButton'))
                 self.btn[len(self.btn)-1].grid(row=r+1, column=c, padx=2, pady=2)
-                self.btn[len(self.btn)-1].configure(command=lambda text=btnLabels[r-1][c]:self.click(text))
+                self.btn[len(self.btn)-1].configure(command=lambda text=self.btnLabels[r-1][c]:self.click(text))
+        self.history = ttk.Label(self.frame, width=30, font=('13'), anchor='e', justify=RIGHT, wraplength=270)
+        if(vShowHistory.get()):
+            self.history.grid(row=0, column=len(self.btnLabels[0]), rowspan=len(self.btnLabels)+2, sticky='N', padx=10)
         self.root.mainloop()
 
     def info(self):
@@ -344,11 +372,34 @@ class pyCalc:
         buttonReset = ttk.Button(frame, text=_("clear"), command=self.clearScreenSizeForm)
         buttonReset.grid(row=4, column=2, columnspan=2, pady=(10,0))
 
+    def changeSettings(self, setting, value):
+        if(setting == 'resultPreview'):
+            if(value):
+                self.resultPreview.grid(row=1, columnspan=len(self.btnLabels[0]), sticky=W+E, padx=5, pady=0)
+            else:
+                self.resultPreview.grid_forget()
+        elif(setting == 'history'):
+            if(value):
+                self.history.grid(row=0, column=len(self.btnLabels[0]), rowspan=len(self.btnLabels)+2, sticky='N', padx=10)
+            else:
+                self.history.grid_forget()
+        config = ConfigParser()
+        cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
+        config.read(cfgpath)
+        if(not config.has_section('Settings')):
+            config.add_section('Settings')
+        config['Settings'][setting] = str(value)
+        with open(cfgpath, 'w') as cfgfile:
+            config.write(cfgfile)
+            cfgfile.close()
+
     def changeTheme(self, theme):
         self.style.theme_use(theme)
         config = ConfigParser()
         cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
         config.read(cfgpath)
+        if(not config.has_section('Personalization')):
+            config.add_section('Personalization')
         config['Personalization']['theme'] = theme
         with open(cfgpath, 'w') as cfgfile:
             config.write(cfgfile)
@@ -360,18 +411,41 @@ class pyCalc:
         config = ConfigParser()
         cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
         config.read(cfgpath)
+        if(not config.has_section('Personalization')):
+            config.add_section('Personalization')
         config['Personalization']['language'] = language
         with open(cfgpath, 'w') as cfgfile:
             config.write(cfgfile)
             cfgfile.close()
         self.root.destroy()
+        self.checkSettings()
         self.startGui()
 
+    def addHistoryItem(self, item):
+        linesInThemes = [10,12,11,10,14,15,10]
+        items = self.history['text'].split('\n')
+        lines = 0
+        for i in items:
+            lines += math.ceil(len(i)/30)
+        while True:
+            if(lines+math.ceil(len(item)/30) < linesInThemes[self.style.theme_names().index(self.style.theme_use())]):
+                self.history['text'] = item+'\n'+'\n'.join(items)
+                break
+            else:
+                lines -= math.ceil(len(items[len(items)-1])/30)
+                items.pop()
+
     def click(self, btn):
+        if(self.end):
+            self.textbox['text'] = "0"
+            self.end = False
         if(btn == '='):
-            result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
-            self.textbox['text'] = str(result)
-            self.resultPreview['text'] = "0"
+            if(self.textbox['text'] != "0"):
+                result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
+                self.addHistoryItem(self.textbox['text']+'='+str(result))
+                self.textbox['text'] = str(result)
+                self.resultPreview['text'] = "0"
+                self.end = True
         elif(btn == 'C'):
             self.textbox['text'] = "0"
             self.resultPreview['text'] = "0"
@@ -547,6 +621,7 @@ class pyCalc:
                                 stack.push(b/a)
                             else:
                                 messagebox.showerror(_("error"), _("err1"))
+                                self.textbox['text'] = '0'
                                 return 0
                         elif(c == "^"):
                             stack.push(b**a)
@@ -557,7 +632,22 @@ class pyCalc:
     def checkSettings(self):
         path = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc')
         if(os.path.isdir(path)):
-            if(not os.path.isfile(os.path.join(path,'settings.ini'))):
+            if(os.path.isfile(os.path.join(path,'settings.ini'))):
+                config = ConfigParser()
+                cfgpath = os.path.join(path,'settings.ini')
+                config.read(cfgpath)
+                for section in self.settingsTemplate:
+                    if(config.has_section(section)):
+                        for option in self.settingsTemplate[section]:
+                            if(not config.has_option(section,option)):
+                                config.set(section,option,self.settingsTemplate[section][option])
+                    else:
+                        self.createDefaultSettingsFile()
+                        return
+                with open(cfgpath, 'w') as cfgfile:
+                    config.write(cfgfile)
+                    cfgfile.close()
+            else:
                 self.createDefaultSettingsFile()
         else:
             os.makedirs(path)
@@ -568,9 +658,10 @@ class pyCalc:
         open(path, 'w+').close()
         config = ConfigParser()
         config.read(path)
-        config.add_section('Personalization')
-        config.set('Personalization','language','pl')
-        config.set('Personalization','theme','vista')
+        for section in self.settingsTemplate:
+            config.add_section(section)
+            for option in self.settingsTemplate[section]:
+                config.set(section,option,self.settingsTemplate[section][option])
         with open(path, 'w') as cfgfile:
             config.write(cfgfile)
             cfgfile.close()
