@@ -7,6 +7,7 @@ pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Pol
 - Screen size calculator
 - Trigonometric function calculator
 - Number system converter
+- Temperature converter
 ## Source
 ### Requirements
 - [pyLang](https://github.com/Programista3/pyLang)
