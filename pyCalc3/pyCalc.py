@@ -45,7 +45,7 @@ class pyCalc:
                 'history': 'false'
             }
         }
-        self.version = "3.1.7"
+        self.version = "3.1.8"
         self.languages = ['pl','en']
         self.lang = "pl"
         self.end = False
@@ -78,6 +78,7 @@ class pyCalc:
             if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names() and config['Settings']['resultPreview'] in ['true','false','True','False','0','1'] and config['Settings']['history'] in ['true','false','True','False','0','1']):
                 self.lang = config['Personalization']['language']
                 lang.select(config['Personalization']['language'])
+                vLang.set(self.lang)
                 vTheme = StringVar(value=config['Personalization']['theme'])
                 self.style.theme_use(config['Personalization']['theme'])
                 if(config['Settings']['resultPreview'] in ['true','True','1']):
@@ -113,6 +114,7 @@ class pyCalc:
         menuFunctions.add_command(label=_("menu1.1"), command=self.screenSize)
         menuFunctions.add_command(label=_("menu1.2"), command=self.trigonometricFunc)
         menuFunctions.add_command(label=_("menu1.3"), command=self.numberSystems)
+        menuFunctions.add_command(label=_("menu1.4"), command=self.temperature)
 
         menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
         menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
@@ -163,8 +165,61 @@ class pyCalc:
         for i in range(0,6):
             self.SS_number[i].delete(0, END)
 
+    def temperature(self):
+        window = Toplevel(self.root)
+        window.resizable(False, False)
+        window.title(_("menu1.4"))
+        window.iconbitmap('pycalc.ico')
+        frame = ttk.Frame(window)
+        frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=20, pady=20)
+        units = [_("celsius"),_("fahrenheit"),_("kelvin")]
+        text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+        labels = []
+        for i in range(4):
+            labels.append(ttk.Label(frame, text=text[i]))
+            labels[i].grid(row=i, column=0, pady=5, padx=8)
+        number = ttk.Entry(frame, width=14)
+        number.bind("<Return>", lambda event: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
+        number.grid(row=0, column=1, padx=10)
+        inCBox = ttk.Combobox(frame, values=units, width=11)
+        inCBox.bind("<Return>", lambda event: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
+        inCBox.current(0)
+        inCBox.grid(row=1, column=1)
+        outCBox = ttk.Combobox(frame, values=units, width=11)
+        outCBox.bind("<Return>", lambda event: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
+        outCBox.current(1)
+        outCBox.grid(row=2, column=1)
+        self.Temp_result = ttk.Label(frame)
+        self.Temp_result.grid(row=3, column=1)
+        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
+        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
+
+    def convertTemperature(self, value, unitIn, unitOut):
+        value = value.replace(',','.')
+        if(self.isNumber(value)):
+            value = float(value)
+            if(unitIn == unitOut):
+                self.Temp_result['text'] = value
+                return
+            if(unitIn == 1):
+                value = 5/9*(value-32)
+            elif(unitIn == 2):
+                value -= 273.15
+            if(unitOut == 1):
+                value = 32+9/5*value
+            elif(unitOut == 2):
+                value += 273.15
+            if(value.is_integer()):
+                value = int(value)
+            else:
+                value = round(value, 10)
+            self.Temp_result['text'] = value
+        else:
+            messagebox.showerror(_("error"), _("err2"))
+
     def numberSystems(self):
         window = Toplevel(self.root)
+        window.resizable(False, False)
         window.title(_("menu1.3"))
         window.iconbitmap('pycalc.ico')
         frame = ttk.Frame(window)
@@ -176,11 +231,14 @@ class pyCalc:
             labels.append(ttk.Label(frame, text=text[i]))
             labels[i].grid(row=i, column=0, pady=5, padx=8)
         number = ttk.Entry(frame, width=14)
+        number.bind("<Return>", lambda event: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
         number.grid(row=0, column=1)
         inCBox = ttk.Combobox(frame, values=systems, width=11)
+        inCBox.bind("<Return>", lambda event: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
         inCBox.current(0)
         inCBox.grid(row=1, column=1)
         outCBox = ttk.Combobox(frame, values=systems, width=11)
+        outCBox.bind("<Return>", lambda event: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
         outCBox.current(1)
         outCBox.grid(row=2, column=1)
         self.NS_result = ttk.Label(frame)
@@ -224,6 +282,7 @@ class pyCalc:
 
     def trigonometricFunc(self):
         window = Toplevel(self.root)
+        window.resizable(False, False)
         window.title(_("menu1.2"))
         window.iconbitmap('pycalc.ico')
         frame = ttk.Frame(window)
@@ -236,11 +295,14 @@ class pyCalc:
             labels.append(ttk.Label(frame, text=text[i]))
             labels[i].grid(row=i, column=0, pady=5, padx=8)
         funcCBox = ttk.Combobox(frame, values=functions, width=8)
+        funcCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
         funcCBox.current(0)
         funcCBox.grid(row=0, column=1)
         value = ttk.Entry(frame, width=11)
+        value.bind("<Return>", lambda event: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
         value.grid(row=1, column=1)
         unitCBox = ttk.Combobox(frame, values=units, width=8)
+        unitCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
         unitCBox.current(0)
         unitCBox.grid(row=2, column=1)
         self.TF_result = ttk.Label(frame)
@@ -249,8 +311,9 @@ class pyCalc:
         submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
 
     def calcTrigonometricFunc(self, function, unit, value):
-        if(value.isdigit()):
-            value = int(value)
+        value = value.replace(',','.')
+        if(self.isNumber(value)):
+            value = float(value)
             if(unit == 0):
                 value = math.radians(value)
             if(function == 'sin'):
@@ -262,6 +325,8 @@ class pyCalc:
             elif(function == 'ctg'):
                 value = 1/math.tan(value)
             self.TF_result['text'] = str(round(value,10))
+        else:
+            messagebox.showerror(_("error"), _("err2"))
 
     def calcScreenSize(self, index):
         if(index != None):
@@ -333,6 +398,7 @@ class pyCalc:
     def screenSize(self):
         self.ssActiveEntry = None
         window = Toplevel(self.root)
+        window.resizable(False, False)
         window.title(_("menu1.1"))
         window.iconbitmap('pycalc.ico')
         frame = ttk.Frame(window)
@@ -371,7 +437,7 @@ class pyCalc:
         buttonCalc.grid(row=4, column=0, columnspan=2, pady=(10,0))
         buttonReset = ttk.Button(frame, text=_("clear"), command=self.clearScreenSizeForm)
         buttonReset.grid(row=4, column=2, columnspan=2, pady=(10,0))
-
+ 
     def changeSettings(self, setting, value):
         if(setting == 'resultPreview'):
             if(value):
