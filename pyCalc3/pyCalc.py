@@ -45,7 +45,7 @@ class pyCalc:
                 'history': 'false'
             }
         }
-        self.version = "3.1.8"
+        self.version = "3.1.9"
         self.languages = ['pl','en']
         self.lang = "pl"
         self.end = False
@@ -115,6 +115,7 @@ class pyCalc:
         menuFunctions.add_command(label=_("menu1.2"), command=self.trigonometricFunc)
         menuFunctions.add_command(label=_("menu1.3"), command=self.numberSystems)
         menuFunctions.add_command(label=_("menu1.4"), command=self.temperature)
+        menuFunctions.add_command(label=_("menu1.5"), command=self.length)
 
         menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
         menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
@@ -165,6 +166,84 @@ class pyCalc:
         for i in range(0,6):
             self.SS_number[i].delete(0, END)
 
+    def length(self):
+        window = Toplevel(self.root)
+        window.resizable(False, False)
+        window.title(_("menu1.5"))
+        window.iconbitmap('pycalc.ico')
+        frame = ttk.Frame(window)
+        frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=20, pady=20)
+        units = [_("millimeters"),_("centimeters"),_("decimeters"),_("meters"),_("kilometers"),_("inches"),_("foots"),_("yards"),_("miles"),_("nautical miles")]
+        text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+        labels = []
+        for i in range(4):
+            labels.append(ttk.Label(frame, text=text[i]))
+            labels[i].grid(row=i, column=0, pady=5, padx=8)
+        number = ttk.Entry(frame, width=14)
+        number.bind("<Return>", lambda event: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
+        number.grid(row=0, column=1, padx=10)
+        inCBox = ttk.Combobox(frame, values=units, width=11)
+        inCBox.bind("<Return>", lambda event: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
+        inCBox.current(0)
+        inCBox.grid(row=1, column=1)
+        outCBox = ttk.Combobox(frame, values=units, width=11)
+        outCBox.bind("<Return>", lambda event: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
+        outCBox.current(1)
+        outCBox.grid(row=2, column=1)
+        self.Length_result = ttk.Label(frame)
+        self.Length_result.grid(row=3, column=1)
+        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
+        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
+
+    def convertLength(self, value, unitIn, unitOut):
+        value = value.replace(',','.')
+        if(self.isNumber(value)):
+            value = float(value)
+            if(unitIn != unitOut):
+                if(unitIn == 0):
+                    value /= 1000
+                elif(unitIn == 1):
+                    value /= 100
+                elif(unitIn == 2):
+                    value /= 10
+                elif(unitIn == 4):
+                    value *= 1000
+                elif(unitIn == 5):
+                    value *= 0.0254
+                elif(unitIn == 6):
+                    value *= 0.3048
+                elif(unitIn == 7):
+                    value *= 0.9144
+                elif(unitIn == 8):
+                    value *= 1609.344
+                elif(unitIn == 9):
+                    value *= 1852
+                if(unitOut == 0):
+                    value *= 1000
+                elif(unitOut == 1):
+                    value *= 100
+                elif(unitOut == 2):
+                    value *= 10
+                elif(unitOut == 4):
+                    value /= 1000
+                elif(unitOut == 5):
+                    value *= 254
+                elif(unitOut == 6):
+                    value /= 0.3048
+                elif(unitOut == 7):
+                    value /= 0.9144
+                elif(unitOut == 8):
+                    value /= 1609.344
+                elif(unitOut == 9):
+                    value /= 1852
+            if(value.is_integer()):
+                value = int(value)
+            else:
+                value = round(value, 10)
+            self.Length_result['text'] = value
+        else:
+            messagebox.showerror(_("error"), _("err2"))
+ 
     def temperature(self):
         window = Toplevel(self.root)
         window.resizable(False, False)
@@ -198,17 +277,15 @@ class pyCalc:
         value = value.replace(',','.')
         if(self.isNumber(value)):
             value = float(value)
-            if(unitIn == unitOut):
-                self.Temp_result['text'] = value
-                return
-            if(unitIn == 1):
-                value = 5/9*(value-32)
-            elif(unitIn == 2):
-                value -= 273.15
-            if(unitOut == 1):
-                value = 32+9/5*value
-            elif(unitOut == 2):
-                value += 273.15
+            if(unitIn != unitOut):
+                if(unitIn == 1):
+                    value = 5/9*(value-32)
+                elif(unitIn == 2):
+                    value -= 273.15
+                if(unitOut == 1):
+                    value = 32+9/5*value
+                elif(unitOut == 2):
+                    value += 273.15
             if(value.is_integer()):
                 value = int(value)
             else:

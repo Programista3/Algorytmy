@@ -6,23 +6,29 @@
     <translation text="8ns">ósemkowy</translation>
     <translation text="calculate">Oblicz</translation>
     <translation text="celsius">Celcjusz</translation>
+    <translation text="centimeters">Centymetry</translation>
     <translation text="clear">Wyczyść</translation>
+    <translation text="decimeters">Decymetry</translation>
     <translation text="degree">stopnie</translation>
     <translation text="diagonal">Przekątna:</translation>
     <translation text="err1">Nie można dzielić przez zero</translation>
     <translation text="err2">Nieprawidłowa wartość</translation>
     <translation text="error">Błąd</translation>
     <translation text="fahrenheit">Fahrenheit</translation>
+    <translation text="foots">Stopy</translation>
     <translation text="function">Funkcja:</translation>
     <translation text="height">Wysokość:</translation>
     <translation text="inch">cali</translation>
+    <translation text="inches">Cale</translation>
     <translation text="inputSystem">System wejściowy:</translation>
     <translation text="kelvin">Kelwiny</translation>
+    <translation text="kilometers">Kilometry</translation>
     <translation text="menu1">Funkcje</translation>
     <translation text="menu1.1">Wymiary ekranu</translation>
     <translation text="menu1.2">Funkcje trygonometryczne</translation>
     <translation text="menu1.3">Systemy liczbowe</translation>
     <translation text="menu1.4">Temperatura</translation>
+    <translation text="menu1.5">Długość</translation>
     <translation text="menu2">Opcje</translation>
     <translation text="menu2.1">Język</translation>
     <translation text="menu2.2">Motyw</translation>
@@ -32,6 +38,10 @@
     <translation text="menu2.1.2">Angielski</translation>
     <translation text="menu3">Pomoc</translation>
     <translation text="menu3.1">pyCalc - Informacje</translation>
+    <translation text="meters">Metry</translation>
+    <translation text="miles">Mile</translation>
+    <translation text="millimeters">Milimetry</translation>
+    <translation text="nautical miles">Mile morskie</translation>
     <translation text="number">Liczba:</translation>
     <translation text="radian">radiany</translation>
     <translation text="ratio">Proporcje:</translation>
@@ -41,4 +51,5 @@
     <translation text="unit">Jednostka:</translation>
     <translation text="value">Wartość:</translation>
     <translation text="width">Szerokość:</translation>
+    <translation text="yards">Jardy</translation>
 </lang>
