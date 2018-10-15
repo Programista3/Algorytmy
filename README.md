@@ -1,6 +1,8 @@
+<img align="right" src="https://github.com/Programista3/pyCalc/blob/master/images/logo.png?raw=true" width="64" height="64">
+
 # pyCalc
 Calculator made in Python using `tkinter`  
-pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)<br><br>
+pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)<br><br><br>
 ![screen](https://github.com/Programista3/pyCalc/blob/master/images/pyCalc3.png?raw=true)
 ## Functions
 - Basic calculator
