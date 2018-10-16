@@ -32,7 +32,359 @@ class Stack:
     def get(self):
         return self.stack[::-1]
 
-class pyCalc:
+class String:
+    def isNumber(self, str):
+        if(str.isdigit()):
+            return 1
+        else:
+            try:
+                float(str)
+                return 2
+            except ValueError:
+                return 0
+
+class StandardWindow:
+    def create(self, root, title, text, units1, units2):
+        self.window = Toplevel(root)
+        self.window.resizable(False, False)
+        self.window.title(title)
+        self.window.iconbitmap('pycalc.ico')
+        self.frame = ttk.Frame(self.window)
+        self.labels = []
+        for i in range(4):
+            self.labels.append(ttk.Label(self.frame, text=text[i]))
+        self.value = ttk.Entry(self.frame, width=14)
+        self.inCBox = ttk.Combobox(self.frame, values=units1, width=11)
+        self.inCBox.current(0)
+        self.outCBox = ttk.Combobox(self.frame, values=units2, width=11)
+        self.outCBox.current(1)
+        self.result = ttk.Label(self.frame)
+        self.submit = ttk.Button(self.frame, text=_("calculate"))
+
+    def grid(self):
+        self.frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=20, pady=20)
+        for i in range(4):
+            self.labels[i].grid(row=i, column=0, pady=5, padx=8)
+        self.value.grid(row=0, column=1, padx=10)
+        self.inCBox.grid(row=1, column=1)
+        self.outCBox.grid(row=2, column=1)
+        self.result.grid(row=3, column=1)
+        self.submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
+
+class LengthCalculator(StandardWindow, String):
+    def __init__(self, root):
+        units = [_("millimeters"),_("centimeters"),_("decimeters"),_("meters"),_("kilometers"),_("inches"),_("foots"),_("yards"),_("miles"),_("nautical miles")]
+        text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+        self.create(root, _("menu1.5"), text, units, units)
+        self.submit.configure(command=lambda: self.convertLength(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.value.bind("<Return>", lambda event: self.convertLength(self.value.get(),self.inCBox.current(),self.outCBox.current()))
+        self.inCBox.bind("<Return>", lambda event: self.convertLength(self.value.get(),self.inCBox.current(),self.outCBox.current()))
+        self.outCBox.bind("<Return>", lambda event: self.convertLength(self.value.get(),self.inCBox.current(),self.outCBox.current()))
+        self.grid()
+
+    def convertLength(self, value, unitIn, unitOut):
+        value = value.replace(',','.')
+        if(self.isNumber(value)):
+            value = float(value)
+            if(unitIn != unitOut):
+                if(unitIn == 0):
+                    value /= 1000
+                elif(unitIn == 1):
+                    value /= 100
+                elif(unitIn == 2):
+                    value /= 10
+                elif(unitIn == 4):
+                    value *= 1000
+                elif(unitIn == 5):
+                    value *= 0.0254
+                elif(unitIn == 6):
+                    value *= 0.3048
+                elif(unitIn == 7):
+                    value *= 0.9144
+                elif(unitIn == 8):
+                    value *= 1609.344
+                elif(unitIn == 9):
+                    value *= 1852
+                if(unitOut == 0):
+                    value *= 1000
+                elif(unitOut == 1):
+                    value *= 100
+                elif(unitOut == 2):
+                    value *= 10
+                elif(unitOut == 4):
+                    value /= 1000
+                elif(unitOut == 5):
+                    value *= 254
+                elif(unitOut == 6):
+                    value /= 0.3048
+                elif(unitOut == 7):
+                    value /= 0.9144
+                elif(unitOut == 8):
+                    value /= 1609.344
+                elif(unitOut == 9):
+                    value /= 1852
+            if(value.is_integer()):
+                value = int(value)
+            else:
+                value = round(value, 10)
+            self.result['text'] = value
+        else:
+            messagebox.showerror(_("error"), _("err2"))
+
+class TemperatureCalculator(StandardWindow, String):
+    def __init__(self, root):
+        units = [_("celsius"),_("fahrenheit"),_("kelvin")]
+        text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+        self.create(root, _("menu1.4"), text, units, units)
+        self.submit.configure(command=lambda: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.value.bind("<Return>", lambda event: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.inCBox.bind("<Return>", lambda event: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.outCBox.bind("<Return>", lambda event: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.grid()
+
+    def convertTemperature(self, value, unitIn, unitOut):
+        value = value.replace(',','.')
+        if(self.isNumber(value)):
+            value = float(value)
+            if(unitIn != unitOut):
+                if(unitIn == 1):
+                    value = 5/9*(value-32)
+                elif(unitIn == 2):
+                    value -= 273.15
+                if(unitOut == 1):
+                    value = 32+9/5*value
+                elif(unitOut == 2):
+                    value += 273.15
+            if(value.is_integer()):
+                value = int(value)
+            else:
+                value = round(value, 10)
+            self.result['text'] = value
+        else:
+            messagebox.showerror(_("error"), _("err2"))
+
+class NumberSystemCalculator(StandardWindow):
+    def __init__(self, root):
+        text = [_("number"),_("inputSystem"),_("targetSystem"),_("result")]
+        systems = [_("2ns"),_("8ns"),_("10ns"),_("16ns")]
+        self.create(root, _("menu1.3"), text, systems, systems)
+        self.submit.configure(command=lambda: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.value.bind("<Return>", lambda event: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.inCBox.bind("<Return>", lambda event: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.outCBox.bind("<Return>", lambda event: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+        self.grid()
+    
+    def convertNumberSystem(self, number, systemIn, systemOut):
+        if(systemIn == 0):
+            if(re.match(r'^[01]+$', number)):
+                number = int(number,2)
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+                return
+        elif(systemIn == 1):
+            if(re.match(r'^[0-7]+$', number)):
+                number = int(number,8)
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+                return
+        elif(systemIn == 2):
+            if(re.match(r'^[0-9]+$', number)):
+                number = int(number)
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+                return
+        elif(systemIn == 3):
+            if(re.match(r'^[0-9a-fA-F]+$', number)):
+                number = int(number,16)
+            else:
+                messagebox.showerror(_("error"), _("err2"))
+                return
+        if(systemOut == 0):
+            self.result['text'] = str(bin(number))[2:]
+        elif(systemOut == 1):
+            self.result['text'] = str(oct(number))[2:]
+        elif(systemOut == 2):
+            self.result['text'] = str(number)
+        elif(systemOut == 3):
+            self.result['text'] = str(hex(number))[2:]
+
+class TrigonometricFunctions(StandardWindow, String):
+    def __init__(self, root):
+        text = [_("function"),_("value"),_("unit"),_("result")]
+        functions = ['sin','cos','tg','ctg']
+        units = [_("degree"),_("radian")]
+        self.create(root, _("menu1.2"), text, functions, units)
+        self.submit.configure(command=lambda: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
+        self.value.bind("<Return>", lambda event: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
+        self.inCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
+        self.outCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
+        self.grid()
+
+    def calcTrigonometricFunc(self, value, function, unit):
+        value = value.replace(',','.')
+        if(self.isNumber(value)):
+            value = float(value)
+            if(unit == 0):
+                value = math.radians(value)
+            if(function == 'sin'):
+                value = math.sin(value)
+            elif(function == 'cos'):
+                value = math.cos(value)
+            elif(function == 'tg'):
+                value = math.tan(value)
+            elif(function == 'ctg'):
+                value = 1/math.tan(value)
+            self.result['text'] = str(round(value,10))
+        else:
+            messagebox.showerror(_("error"), _("err2"))
+
+class ScreenSizeCalculator(String):
+    def __init__(self, root):
+        self.root = root
+        self.ssActiveEntry = None
+        self.create()
+        self.bind()
+        self.grid()
+
+    def create(self):
+        ratio = ['16:9','16:10','4:3','3:2','5:4','21:9','2:1']
+        text = [_('ratio'), _('diagonal'), _('width'), _('height')]
+        self.window = Toplevel(self.root)
+        self.window.resizable(False, False)
+        self.window.title(_("menu1.1"))
+        self.window.iconbitmap('pycalc.ico')
+        self.frame = ttk.Frame(self.window)
+        self.frame.focus_set()
+        self.ratioCBox = ttk.Combobox(self.frame, values=ratio, width=12)
+        self.ratioCBox.current(0)
+        self.label = []
+        self.entry = []
+        for i in range(4):
+            self.label.append(ttk.Label(self.frame, text=text[i]))
+        for i in range(1,4):
+            self.entry.append(ttk.Entry(self.frame, width=6))
+        for i in range(4,7):
+            self.label.append(ttk.Label(self.frame, text=_("inch")))
+        for i in range(3,6):
+            self.entry.append(ttk.Entry(self.frame, width=6))
+        for i in range(7,10):
+            self.label.append(ttk.Label(self.frame, text="cm"))
+        self.submit = ttk.Button(self.frame, text=_("calculate"), command=lambda: self.calcScreenSize(self.ssActiveEntry))
+        self.reset = ttk.Button(self.frame, text=_("clear"), command=self.clearScreenSizeForm)
+
+    def bind(self):
+        self.frame.bind("<Button>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+        for i in range(3):
+            self.entry[i].bind("<FocusIn>", lambda event, index=i: self.screenSizeActiveEntry(index))
+            self.entry[i].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.entry[i].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+        for i in range(3,6):
+            self.entry[i].bind("<FocusIn>", lambda event, index=i: self.screenSizeActiveEntry(index))
+            self.entry[i].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+            self.entry[i].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
+
+    def grid(self):
+        self.frame.grid(row=0, column=0, rowspan=3, columnspan=5, padx=30, pady=20)
+        self.ratioCBox.grid(row=0, column=1, columnspan=4)
+        for i in range(4):
+            self.label[i].grid(row=i, column=0, pady=5)
+        for i in range(3):
+            self.entry[i].grid(row=i+1, column=1, padx=(10, 0))
+        for i in range(4,7):
+            self.label[i].grid(row=i-3, column=2)
+        for i in range(3,6):
+            self.entry[i].grid(row=i-2, column=3, padx=(10,0))
+        for i in range(7,10):
+            self.label[i].grid(row=i-6, column=4)
+        self.submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
+        self.reset.grid(row=4, column=2, columnspan=2, pady=(10,0))
+
+    def calcScreenSizeDiagonal(self, diagonal, ratio):
+        result = ((ratio[0]**2+ratio[1]**2)**0.5)/float(diagonal)
+        return (round(ratio[0]/result,2), round(ratio[1]/result,2))
+
+    def calcScreenSizeWidth(self, width, ratio):
+        height = round(width*ratio[1]/ratio[0],2)
+        diagonal = round((width**2+height**2)**0.5,2)
+        return (height, diagonal)
+
+    def calcScreenSizeHeight(self, height, ratio):
+        width = round(height*ratio[0]/ratio[1],2)
+        diagonal = round((width**2+height**2)**0.5,2)
+        return (width, diagonal)
+
+    def clearScreenSizeForm(self):
+        for i in range(0,6):
+            self.entry[i].delete(0, END)   
+
+    def calcScreenSize(self, index):
+        if(index != None):
+            ratio = list(map(int, self.ratioCBox.get().split(':')))
+            if(index == 0):
+                if(self.isNumber(self.entry[0].get())):
+                    result = self.calcScreenSizeDiagonal(float(self.entry[0].get()), ratio)
+                    for i in range(1,6):
+                        self.entry[i].delete(0, END)
+                    self.entry[1].insert(0, result[0])
+                    self.entry[2].insert(0, result[1])
+                    self.entry[3].insert(0, round(float(self.entry[0].get())*2.54,2))
+                    self.entry[4].insert(0, round(result[0]*2.54,2))
+                    self.entry[5].insert(0, round(result[1]*2.54,2))
+            elif(index == 1):
+                if(self.isNumber(self.entry[1].get())):
+                    result = self.calcScreenSizeWidth(float(self.entry[1].get()), ratio)
+                    for i in [0,2,3,4,5]:
+                        self.entry[i].delete(0, END)
+                    self.entry[0].insert(0, result[1])
+                    self.entry[2].insert(0, result[0])
+                    self.entry[3].insert(0, round(result[1]*2.54,2))
+                    self.entry[4].insert(0, round(float(self.entry[1].get())*2.54,2))
+                    self.entry[5].insert(0, round(result[0]*2.54,2))
+            elif(index == 2):
+                if(self.isNumber(self.entry[2].get())):
+                    result = self.calcScreenSizeHeight(float(self.entry[2].get()), ratio)
+                    for i in [0,1,3,4,5]:
+                        self.entry[i].delete(0, END)
+                    self.entry[0].insert(0, result[1])
+                    self.entry[1].insert(0, result[0])
+                    self.entry[3].insert(0, round(result[1]*2.54,2))
+                    self.entry[4].insert(0, round(result[0]*2.54,2))
+                    self.entry[5].insert(0, round(float(self.entry[2].get())*2.54,2))
+            elif(index == 3):
+                if(self.isNumber(self.entry[3].get())):
+                    result = self.calcScreenSizeDiagonal(self.entry[3].get(), ratio)
+                    for i in [0,1,2,4,5]:
+                        self.entry[i].delete(0, END)
+                    self.entry[0].insert(0, round(float(self.entry[3].get())/2.54,2))
+                    self.entry[1].insert(0, round(result[0]/2.54,2))
+                    self.entry[2].insert(0, round(result[1]/2.54,2))
+                    self.entry[4].insert(0, round(result[0],2))
+                    self.entry[5].insert(0, round(result[1],2))
+            elif(index == 4):
+                if(self.isNumber(self.entry[4].get())):
+                    result = self.calcScreenSizeWidth(float(self.entry[4].get()), ratio)
+                    for i in [0,1,2,3,5]:
+                        self.entry[i].delete(0, END)
+                    self.entry[0].insert(0, round(result[1]/2.54,2))
+                    self.entry[1].insert(0, round(float(self.entry[4].get())/2.54,2))
+                    self.entry[2].insert(0, round(result[0]/2.54,2))
+                    self.entry[3].insert(0, result[1])
+                    self.entry[5].insert(0, result[0])
+            elif(index == 5):
+                if(self.isNumber(self.entry[5].get())):
+                    result = self.calcScreenSizeHeight(float(self.entry[5].get()), ratio)
+                    for i in [0,1,2,3,4]:
+                        self.entry[i].delete(0, END)
+                    self.entry[0].insert(0, round(result[1]/2.54,2))
+                    self.entry[1].insert(0, round(result[0]/2.54,2))
+                    self.entry[2].insert(0, round(float(self.entry[5].get())/2.54,2))
+                    self.entry[3].insert(0, result[1])
+                    self.entry[4].insert(0, result[0])
+
+    def screenSizeActiveEntry(self, index):
+        self.ssActiveEntry = index
+        
+class pyCalc(String):
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
         self.settingsTemplate = {
@@ -45,7 +397,7 @@ class pyCalc:
                 'history': 'false'
             }
         }
-        self.version = "3.1.9"
+        self.version = "3.1.10"
         self.languages = ['pl','en']
         self.lang = "pl"
         self.end = False
@@ -111,12 +463,15 @@ class pyCalc:
         menuOptions.add_checkbutton(label=_("menu2.3"), onvalue=True, offvalue=False, variable=vShowPreview, command=lambda: self.changeSettings('resultPreview', vShowPreview.get()))
         menuOptions.add_checkbutton(label=_("menu2.4"), onvalue=True, offvalue=False, variable=vShowHistory, command=lambda: self.changeSettings('history', vShowHistory.get()))
         menuHelp.add_command(label=_("menu3.1"), command=self.info)
-        menuFunctions.add_command(label=_("menu1.1"), command=self.screenSize)
-        menuFunctions.add_command(label=_("menu1.2"), command=self.trigonometricFunc)
-        menuFunctions.add_command(label=_("menu1.3"), command=self.numberSystems)
-        menuFunctions.add_command(label=_("menu1.4"), command=self.temperature)
-        menuFunctions.add_command(label=_("menu1.5"), command=self.length)
-
+        menuItems = {
+            _("menu1.1"): 'screenSize',
+            _("menu1.2"): 'trigonometricFunc',
+            _("menu1.3"): 'numberSystems',
+            _("menu1.4"): 'temperature',
+            _("menu1.5"): 'length'
+        }
+        for item in sorted(menuItems.keys()):
+            menuFunctions.add_command(label=item, command=lambda func=menuItems[item]: self.function(func))
         menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
         menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
         for i in self.style.theme_names():
@@ -148,372 +503,17 @@ class pyCalc:
     def info(self):
         messagebox.showinfo(_("menu3.1"), ("pyCalc v."+self.version+"\nGNU AGPL v.3.0\nhttps://github.com/Programista3/pyCalc"))
 
-    def calcScreenSizeDiagonal(self, diagonal, ratio):
-        result = ((ratio[0]**2+ratio[1]**2)**0.5)/float(diagonal)
-        return (round(ratio[0]/result,2), round(ratio[1]/result,2))
-
-    def calcScreenSizeWidth(self, width, ratio):
-        height = round(width*ratio[1]/ratio[0],2)
-        diagonal = round((width**2+height**2)**0.5,2)
-        return (height, diagonal)
-
-    def calcScreenSizeHeight(self, height, ratio):
-        width = round(height*ratio[0]/ratio[1],2)
-        diagonal = round((width**2+height**2)**0.5,2)
-        return (width, diagonal)
-
-    def clearScreenSizeForm(self):
-        for i in range(0,6):
-            self.SS_number[i].delete(0, END)
-
-    def length(self):
-        window = Toplevel(self.root)
-        window.resizable(False, False)
-        window.title(_("menu1.5"))
-        window.iconbitmap('pycalc.ico')
-        frame = ttk.Frame(window)
-        frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=20, pady=20)
-        units = [_("millimeters"),_("centimeters"),_("decimeters"),_("meters"),_("kilometers"),_("inches"),_("foots"),_("yards"),_("miles"),_("nautical miles")]
-        text = [_("value"),_("unit"),_("targetUnit"),_("result")]
-        labels = []
-        for i in range(4):
-            labels.append(ttk.Label(frame, text=text[i]))
-            labels[i].grid(row=i, column=0, pady=5, padx=8)
-        number = ttk.Entry(frame, width=14)
-        number.bind("<Return>", lambda event: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
-        number.grid(row=0, column=1, padx=10)
-        inCBox = ttk.Combobox(frame, values=units, width=11)
-        inCBox.bind("<Return>", lambda event: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
-        inCBox.current(0)
-        inCBox.grid(row=1, column=1)
-        outCBox = ttk.Combobox(frame, values=units, width=11)
-        outCBox.bind("<Return>", lambda event: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
-        outCBox.current(1)
-        outCBox.grid(row=2, column=1)
-        self.Length_result = ttk.Label(frame)
-        self.Length_result.grid(row=3, column=1)
-        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.convertLength(number.get(),inCBox.current(),outCBox.current()))
-        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
-
-    def convertLength(self, value, unitIn, unitOut):
-        value = value.replace(',','.')
-        if(self.isNumber(value)):
-            value = float(value)
-            if(unitIn != unitOut):
-                if(unitIn == 0):
-                    value /= 1000
-                elif(unitIn == 1):
-                    value /= 100
-                elif(unitIn == 2):
-                    value /= 10
-                elif(unitIn == 4):
-                    value *= 1000
-                elif(unitIn == 5):
-                    value *= 0.0254
-                elif(unitIn == 6):
-                    value *= 0.3048
-                elif(unitIn == 7):
-                    value *= 0.9144
-                elif(unitIn == 8):
-                    value *= 1609.344
-                elif(unitIn == 9):
-                    value *= 1852
-                if(unitOut == 0):
-                    value *= 1000
-                elif(unitOut == 1):
-                    value *= 100
-                elif(unitOut == 2):
-                    value *= 10
-                elif(unitOut == 4):
-                    value /= 1000
-                elif(unitOut == 5):
-                    value *= 254
-                elif(unitOut == 6):
-                    value /= 0.3048
-                elif(unitOut == 7):
-                    value /= 0.9144
-                elif(unitOut == 8):
-                    value /= 1609.344
-                elif(unitOut == 9):
-                    value /= 1852
-            if(value.is_integer()):
-                value = int(value)
-            else:
-                value = round(value, 10)
-            self.Length_result['text'] = value
-        else:
-            messagebox.showerror(_("error"), _("err2"))
- 
-    def temperature(self):
-        window = Toplevel(self.root)
-        window.resizable(False, False)
-        window.title(_("menu1.4"))
-        window.iconbitmap('pycalc.ico')
-        frame = ttk.Frame(window)
-        frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=20, pady=20)
-        units = [_("celsius"),_("fahrenheit"),_("kelvin")]
-        text = [_("value"),_("unit"),_("targetUnit"),_("result")]
-        labels = []
-        for i in range(4):
-            labels.append(ttk.Label(frame, text=text[i]))
-            labels[i].grid(row=i, column=0, pady=5, padx=8)
-        number = ttk.Entry(frame, width=14)
-        number.bind("<Return>", lambda event: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
-        number.grid(row=0, column=1, padx=10)
-        inCBox = ttk.Combobox(frame, values=units, width=11)
-        inCBox.bind("<Return>", lambda event: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
-        inCBox.current(0)
-        inCBox.grid(row=1, column=1)
-        outCBox = ttk.Combobox(frame, values=units, width=11)
-        outCBox.bind("<Return>", lambda event: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
-        outCBox.current(1)
-        outCBox.grid(row=2, column=1)
-        self.Temp_result = ttk.Label(frame)
-        self.Temp_result.grid(row=3, column=1)
-        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.convertTemperature(number.get(),inCBox.current(),outCBox.current()))
-        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
-
-    def convertTemperature(self, value, unitIn, unitOut):
-        value = value.replace(',','.')
-        if(self.isNumber(value)):
-            value = float(value)
-            if(unitIn != unitOut):
-                if(unitIn == 1):
-                    value = 5/9*(value-32)
-                elif(unitIn == 2):
-                    value -= 273.15
-                if(unitOut == 1):
-                    value = 32+9/5*value
-                elif(unitOut == 2):
-                    value += 273.15
-            if(value.is_integer()):
-                value = int(value)
-            else:
-                value = round(value, 10)
-            self.Temp_result['text'] = value
-        else:
-            messagebox.showerror(_("error"), _("err2"))
-
-    def numberSystems(self):
-        window = Toplevel(self.root)
-        window.resizable(False, False)
-        window.title(_("menu1.3"))
-        window.iconbitmap('pycalc.ico')
-        frame = ttk.Frame(window)
-        frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=30, pady=20)
-        text = [_("number"),_("inputSystem"),_("targetSystem"),_("result")]
-        systems = [_("2ns"),_("8ns"),_("10ns"),_("16ns")]
-        labels = []
-        for i in range(4):
-            labels.append(ttk.Label(frame, text=text[i]))
-            labels[i].grid(row=i, column=0, pady=5, padx=8)
-        number = ttk.Entry(frame, width=14)
-        number.bind("<Return>", lambda event: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
-        number.grid(row=0, column=1)
-        inCBox = ttk.Combobox(frame, values=systems, width=11)
-        inCBox.bind("<Return>", lambda event: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
-        inCBox.current(0)
-        inCBox.grid(row=1, column=1)
-        outCBox = ttk.Combobox(frame, values=systems, width=11)
-        outCBox.bind("<Return>", lambda event: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
-        outCBox.current(1)
-        outCBox.grid(row=2, column=1)
-        self.NS_result = ttk.Label(frame)
-        self.NS_result.grid(row=3, column=1)
-        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.convertNumberSystem(number.get(),inCBox.current(),outCBox.current()))
-        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
-
-    def convertNumberSystem(self, number, systemIn, systemOut):
-        if(systemIn == 0):
-            if(re.match(r'^[01]+$', number)):
-                number = int(number,2)
-            else:
-                messagebox.showerror(_("error"), _("err2"))
-                return
-        elif(systemIn == 1):
-            if(re.match(r'^[0-7]+$', number)):
-                number = int(number,8)
-            else:
-                messagebox.showerror(_("error"), _("err2"))
-                return
-        elif(systemIn == 2):
-            if(re.match(r'^[0-9]+$', number)):
-                number = int(number)
-            else:
-                messagebox.showerror(_("error"), _("err2"))
-                return
-        elif(systemIn == 3):
-            if(re.match(r'^[0-9a-fA-F]+$', number)):
-                number = int(number,16)
-            else:
-                messagebox.showerror(_("error"), _("err2"))
-                return
-        if(systemOut == 0):
-            self.NS_result['text'] = str(bin(number))[2:]
-        elif(systemOut == 1):
-            self.NS_result['text'] = str(oct(number))[2:]
-        elif(systemOut == 2):
-            self.NS_result['text'] = str(number)
-        elif(systemOut == 3):
-            self.NS_result['text'] = str(hex(number))[2:]
-
-    def trigonometricFunc(self):
-        window = Toplevel(self.root)
-        window.resizable(False, False)
-        window.title(_("menu1.2"))
-        window.iconbitmap('pycalc.ico')
-        frame = ttk.Frame(window)
-        frame.grid(row=0, column=0, rowspan=5, columnspan=2, padx=30, pady=20)
-        text = [_("function"),_("value"),_("unit"),_("result")]
-        functions = ['sin','cos','tg','ctg']
-        units = [_("degree"),_("radian")]
-        labels = []
-        for i in range(4):
-            labels.append(ttk.Label(frame, text=text[i]))
-            labels[i].grid(row=i, column=0, pady=5, padx=8)
-        funcCBox = ttk.Combobox(frame, values=functions, width=8)
-        funcCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
-        funcCBox.current(0)
-        funcCBox.grid(row=0, column=1)
-        value = ttk.Entry(frame, width=11)
-        value.bind("<Return>", lambda event: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
-        value.grid(row=1, column=1)
-        unitCBox = ttk.Combobox(frame, values=units, width=8)
-        unitCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
-        unitCBox.current(0)
-        unitCBox.grid(row=2, column=1)
-        self.TF_result = ttk.Label(frame)
-        self.TF_result.grid(row=3, column=1)
-        submit = ttk.Button(frame, text=_("calculate"), command=lambda: self.calcTrigonometricFunc(funcCBox.get(),unitCBox.current(),value.get()))
-        submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
-
-    def calcTrigonometricFunc(self, function, unit, value):
-        value = value.replace(',','.')
-        if(self.isNumber(value)):
-            value = float(value)
-            if(unit == 0):
-                value = math.radians(value)
-            if(function == 'sin'):
-                value = math.sin(value)
-            elif(function == 'cos'):
-                value = math.cos(value)
-            elif(function == 'tg'):
-                value = math.tan(value)
-            elif(function == 'ctg'):
-                value = 1/math.tan(value)
-            self.TF_result['text'] = str(round(value,10))
-        else:
-            messagebox.showerror(_("error"), _("err2"))
-
-    def calcScreenSize(self, index):
-        if(index != None):
-            ratio = list(map(int, self.SS_combobox.get().split(':')))
-            if(index == 0):
-                if(self.isNumber(self.SS_number[0].get())):
-                    result = self.calcScreenSizeDiagonal(float(self.SS_number[0].get()), ratio)
-                    for i in range(1,6):
-                        self.SS_number[i].delete(0, END)
-                    self.SS_number[1].insert(0, result[0])
-                    self.SS_number[2].insert(0, result[1])
-                    self.SS_number[3].insert(0, round(float(self.SS_number[0].get())*2.54,2))
-                    self.SS_number[4].insert(0, round(result[0]*2.54,2))
-                    self.SS_number[5].insert(0, round(result[1]*2.54,2))
-            elif(index == 1):
-                if(self.isNumber(self.SS_number[1].get())):
-                    result = self.calcScreenSizeWidth(float(self.SS_number[1].get()), ratio)
-                    for i in [0,2,3,4,5]:
-                        self.SS_number[i].delete(0, END)
-                    self.SS_number[0].insert(0, result[1])
-                    self.SS_number[2].insert(0, result[0])
-                    self.SS_number[3].insert(0, round(result[1]*2.54,2))
-                    self.SS_number[4].insert(0, round(float(self.SS_number[1].get())*2.54,2))
-                    self.SS_number[5].insert(0, round(result[0]*2.54,2))
-            elif(index == 2):
-                if(self.isNumber(self.SS_number[2].get())):
-                    result = self.calcScreenSizeHeight(float(self.SS_number[2].get()), ratio)
-                    for i in [0,1,3,4,5]:
-                        self.SS_number[i].delete(0, END)
-                    self.SS_number[0].insert(0, result[1])
-                    self.SS_number[1].insert(0, result[0])
-                    self.SS_number[3].insert(0, round(result[1]*2.54,2))
-                    self.SS_number[4].insert(0, round(result[0]*2.54,2))
-                    self.SS_number[5].insert(0, round(float(self.SS_number[2].get())*2.54,2))
-            elif(index == 3):
-                if(self.isNumber(self.SS_number[3].get())):
-                    result = self.calcScreenSizeDiagonal(self.SS_number[3].get(), ratio)
-                    for i in [0,1,2,4,5]:
-                        self.SS_number[i].delete(0, END)
-                    self.SS_number[0].insert(0, round(float(self.SS_number[3].get())/2.54,2))
-                    self.SS_number[1].insert(0, round(result[0]/2.54,2))
-                    self.SS_number[2].insert(0, round(result[1]/2.54,2))
-                    self.SS_number[4].insert(0, round(result[0],2))
-                    self.SS_number[5].insert(0, round(result[1],2))
-            elif(index == 4):
-                if(self.isNumber(self.SS_number[4].get())):
-                    result = self.calcScreenSizeWidth(float(self.SS_number[4].get()), ratio)
-                    for i in [0,1,2,3,5]:
-                        self.SS_number[i].delete(0, END)
-                    self.SS_number[0].insert(0, round(result[1]/2.54,2))
-                    self.SS_number[1].insert(0, round(float(self.SS_number[4].get())/2.54,2))
-                    self.SS_number[2].insert(0, round(result[0]/2.54,2))
-                    self.SS_number[3].insert(0, result[1])
-                    self.SS_number[5].insert(0, result[0])
-            elif(index == 5):
-                if(self.isNumber(self.SS_number[5].get())):
-                    result = self.calcScreenSizeHeight(float(self.SS_number[5].get()), ratio)
-                    for i in [0,1,2,3,4]:
-                        self.SS_number[i].delete(0, END)
-                    self.SS_number[0].insert(0, round(result[1]/2.54,2))
-                    self.SS_number[1].insert(0, round(result[0]/2.54,2))
-                    self.SS_number[2].insert(0, round(float(self.SS_number[5].get())/2.54,2))
-                    self.SS_number[3].insert(0, result[1])
-                    self.SS_number[4].insert(0, result[0])
-
-    def screenSizeActiveEntry(self, index):
-        self.ssActiveEntry = index
-
-    def screenSize(self):
-        self.ssActiveEntry = None
-        window = Toplevel(self.root)
-        window.resizable(False, False)
-        window.title(_("menu1.1"))
-        window.iconbitmap('pycalc.ico')
-        frame = ttk.Frame(window)
-        frame.bind("<Button>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-        frame.focus_set()
-        frame.grid(row=0, column=0, rowspan=3, columnspan=5, padx=30, pady=20)
-        ratio = ['16:9','16:10','4:3','3:2','5:4','21:9','2:1']
-        self.SS_combobox = ttk.Combobox(frame, values=ratio, width=12)
-        self.SS_combobox.current(0)
-        self.SS_combobox.grid(row=0, column=1, columnspan=4)
-        text = [_('ratio'), _('diagonal'), _('width'), _('height')]
-        label = []
-        self.SS_number = []
-        for i in range(4):
-            label.append(ttk.Label(frame, text=text[i]))
-            label[i].grid(row=i, column=0, pady=5)
-        for i in range(1,4):
-            self.SS_number.append(ttk.Entry(frame, width=6))
-            self.SS_number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
-            self.SS_number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.SS_number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.SS_number[i-1].grid(row=i, column=1, padx=(10, 0))
-        for i in range(4,7):
-            label.append(ttk.Label(frame, text=_("inch")))
-            label[i].grid(row=i-3, column=2)
-        for i in range(4,7):
-            self.SS_number.append(ttk.Entry(frame, width=6))
-            self.SS_number[i-1].bind("<FocusIn>", lambda event, index=i-1: self.screenSizeActiveEntry(index))
-            self.SS_number[i-1].bind("<FocusOut>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.SS_number[i-1].bind("<Return>", lambda event: self.calcScreenSize(self.ssActiveEntry))
-            self.SS_number[i-1].grid(row=i-3, column=3, padx=(10,0))
-        for i in range(7,10):
-            label.append(ttk.Label(frame, text="cm"))
-            label[i].grid(row=i-6, column=4)
-        buttonCalc = ttk.Button(frame, text=_("calculate"), command=lambda: self.calcScreenSize(self.ssActiveEntry))
-        buttonCalc.grid(row=4, column=0, columnspan=2, pady=(10,0))
-        buttonReset = ttk.Button(frame, text=_("clear"), command=self.clearScreenSizeForm)
-        buttonReset.grid(row=4, column=2, columnspan=2, pady=(10,0))
+    def function(self, function):
+        if(function == 'length'):
+            calc = LengthCalculator(self.root)
+        elif(function == 'temperature'):
+            calc = TemperatureCalculator(self.root)
+        elif(function == 'numberSystems'):
+            calc = NumberSystemCalculator(self.root)
+        elif(function == 'trigonometricFunc'):
+            calc = TrigonometricFunctions(self.root)
+        elif(function == 'screenSize'):
+            calc = ScreenSizeCalculator(self.root)
  
     def changeSettings(self, setting, value):
         if(setting == 'resultPreview'):
@@ -649,16 +649,6 @@ class pyCalc:
 
     def isFunction(self, char):
         return char in ['%','‰']
-
-    def isNumber(self, str):
-        if(str.isdigit()):
-            return 1
-        else:
-            try:
-                float(str)
-                return 2
-            except ValueError:
-                return 0
 
     def priority(self, operator):
         if(operator == '+' or operator == '-'):
