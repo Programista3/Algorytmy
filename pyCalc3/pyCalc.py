@@ -383,7 +383,7 @@ class ScreenSizeCalculator(String):
 
     def screenSizeActiveEntry(self, index):
         self.ssActiveEntry = index
-        
+
 class pyCalc(String):
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
@@ -448,32 +448,47 @@ class pyCalc(String):
 
         menu = Menu(self.root)
         menuFunctions = Menu(self.root, tearoff=0)
+        menuFormulas = Menu(self.root, tearoff=0)
+        menuArea = Menu(self.root, tearoff=0)
         menuOptions = Menu(self.root, tearoff=0)
         menuLanguage = Menu(self.root, tearoff=0)
         menuTheme = Menu(self.root, tearoff=0)
         menuHelp = Menu(self.root, tearoff=0)
 
         menu.add_cascade(label=_("menu1"), menu=menuFunctions)
-        menu.add_cascade(label=_("menu2"), menu=menuOptions)
-        menu.add_cascade(label=_("menu3"), menu=menuHelp)
+        menu.add_cascade(label=_("menu2"), menu=menuFormulas)
+        menu.add_cascade(label=_("menu3"), menu=menuOptions)
+        menu.add_cascade(label=_("menu4"), menu=menuHelp)
 
-        menuOptions.add_cascade(label=_("menu2.1"), menu=menuLanguage)
-        menuOptions.add_cascade(label=_("menu2.2"), menu=menuTheme)
+        menuFormulas.add_cascade(label=_("menu2.1"), menu=menuArea, state="disabled")
+        menuAreaItems = {
+            _("rectangle"): "rectangleArea",
+            _("parallelogram"): "parallelogramArea",
+            _("triangle"): "triangleArea",
+            _("rhomboid"): "rhomboidArea",
+            _("trapezium"): "trapeziumArea",
+            _("circle"): "circleArea"
+        }
+        for item in sorted(menuAreaItems.keys()):
+            menuArea.add_command(label=item, command=lambda func=menuAreaItems[item]: self.function(func))
+
+        menuOptions.add_cascade(label=_("menu3.1"), menu=menuLanguage)
+        menuOptions.add_cascade(label=_("menu3.2"), menu=menuTheme)
         menuOptions.add_separator()
-        menuOptions.add_checkbutton(label=_("menu2.3"), onvalue=True, offvalue=False, variable=vShowPreview, command=lambda: self.changeSettings('resultPreview', vShowPreview.get()))
-        menuOptions.add_checkbutton(label=_("menu2.4"), onvalue=True, offvalue=False, variable=vShowHistory, command=lambda: self.changeSettings('history', vShowHistory.get()))
-        menuHelp.add_command(label=_("menu3.1"), command=self.info)
-        menuItems = {
+        menuOptions.add_checkbutton(label=_("menu3.3"), onvalue=True, offvalue=False, variable=vShowPreview, command=lambda: self.changeSettings('resultPreview', vShowPreview.get()))
+        menuOptions.add_checkbutton(label=_("menu3.4"), onvalue=True, offvalue=False, variable=vShowHistory, command=lambda: self.changeSettings('history', vShowHistory.get()))
+        menuHelp.add_command(label=_("menu4.1"), command=self.info)
+        menuFunctionsItems = {
             _("menu1.1"): 'screenSize',
             _("menu1.2"): 'trigonometricFunc',
             _("menu1.3"): 'numberSystems',
             _("menu1.4"): 'temperature',
             _("menu1.5"): 'length'
         }
-        for item in sorted(menuItems.keys()):
-            menuFunctions.add_command(label=item, command=lambda func=menuItems[item]: self.function(func))
-        menuLanguage.add_radiobutton(label=_("menu2.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
-        menuLanguage.add_radiobutton(label=_("menu2.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
+        for item in sorted(menuFunctionsItems.keys()):
+            menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
+        menuLanguage.add_radiobutton(label=_("menu3.1.1"), var=vLang, value="pl", command=lambda: self.selectLanguage("pl"))
+        menuLanguage.add_radiobutton(label=_("menu3.1.2"), var=vLang, value="en", command=lambda: self.selectLanguage("en"))
         for i in self.style.theme_names():
             menuTheme.add_radiobutton(label=i.capitalize(), var=vTheme, value=i, command=lambda th=i: self.changeTheme(th))
 
