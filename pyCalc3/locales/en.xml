@@ -8,6 +8,7 @@
     <translation text="celsius">Celsius</translation>
     <translation text="centimeters">Centimeters</translation>
     <translation text="clear">Clear</translation>
+    <translation text="currency">Currency:</translation>
     <translation text="decimeters">Decimeters</translation>
     <translation text="degree">degrees</translation>
     <translation text="diagonal">Diagonal:</translation>
@@ -29,6 +30,7 @@
     <translation text="menu1.3">Number systems</translation>
     <translation text="menu1.4">Temperature</translation>
     <translation text="menu1.5">Length</translation>
+    <translation text="menu1.6">Currency</translation>
     <translation text="menu2">Formulas</translation>
     <translation text="menu2.1">Area of shapes</translation>
     <translation text="menu3">Options</translation>
@@ -48,6 +50,9 @@
     <translation text="radian">radians</translation>
     <translation text="ratio">Aspect Ratio:</translation>
     <translation text="result">Result:</translation>
+    <translation text="status01">Downloading exchange rate...</translation>
+    <translation text="status02">Ready!</translation>
+    <translation text="targetCurrency">Target Currency:</translation>
     <translation text="targetSystem">Target system:</translation>
     <translation text="targetUnit">Target unit:</translation>
     <translation text="unit">Unit:</translation>

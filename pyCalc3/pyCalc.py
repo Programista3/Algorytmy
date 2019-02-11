@@ -6,6 +6,8 @@ import re
 import os
 import math
 from configparser import ConfigParser
+import urllib.request as urllib
+import json
 import lang
 _ = lang.get
 
@@ -62,7 +64,7 @@ class StandardWindow:
         self.submit = ttk.Button(self.frame, text=_("calculate"))
 
     def grid(self):
-        self.frame.grid(row=0, column=0, rowspan=2, columnspan=5, padx=20, pady=20)
+        self.frame.grid(row=0, column=0, rowspan=5, columnspan=2, padx=20, pady=20)
         for i in range(4):
             self.labels[i].grid(row=i, column=0, pady=5, padx=8)
         self.value.grid(row=0, column=1, padx=10)
@@ -384,6 +386,26 @@ class ScreenSizeCalculator(String):
     def screenSizeActiveEntry(self, index):
         self.ssActiveEntry = index
 
+class CurrencyConverter(StandardWindow):
+    def __init__(self, root):
+        currencies = ['AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD', 'AWG', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN', 'BHD', 'BIF', 'BND', 'BOB', 'BRL', 'BSD', 'BTC', 'BTN', 'BWP', 'BYN', 'BYR', 'BZD', 'CAD', 'CDF', 'CHF', 'CLP', 'CNY', 'COP', 'CRC', 'CUP', 'CVE', 'CZK', 'DJF', 'DKK', 'DOP', 'DZD', 'EGP', 'ERN', 'ETB', 'EUR', 'FJD', 'FKP', 'GBP', 'GEL', 'GHS', 'GIP', 'GMD', 'GNF', 'GTQ', 'GYD', 'HKD', 'HNL', 'HRK', 'HTG', 'HUF', 'IDR', 'ILS', 'INR', 'IQD', 'IRR', 'ISK', 'JMD', 'JOD', 'JPY', 'KES', 'KGS', 'KHR', 'KMF', 'KPW', 'KRW', 'KWD', 'KYD', 'KZT', 'LAK', 'LBP', 'LKR', 'LRD', 'LSL', 'LVL', 'LYD', 'MAD', 'MDL', 'MGA', 'MKD', 'MMK', 'MNT', 'MOP', 'MRO', 'MUR', 'MVR', 'MWK', 'MXN', 'MYR', 'MZN', 'NAD', 'NGN', 'NIO', 'NOK', 'NPR', 'NZD', 'OMR', 'PAB', 'PEN', 'PGK', 'PHP', 'PKR', 'PLN', 'PYG', 'QAR', 'RON', 'RSD', 'RUB', 'RWF', 'SAR', 'SBD', 'SCR', 'SDG', 'SEK', 'SGD', 'SHP', 'SLL', 'SOS', 'SRD', 'STD', 'SYP', 'SZL', 'THB', 'TJS', 'TMT', 'TND', 'TOP', 'TRY', 'TTD', 'TWD', 'TZS', 'UAH', 'UGX', 'USD', 'UYU', 'UZS', 'VEF', 'VND', 'VUV', 'WST', 'XAF', 'XCD', 'XDR', 'XOF', 'XPF', 'YER', 'ZAR', 'ZMW']
+        text = [_("value"),_("currency"),_("targetCurrency"),_("result")]
+        self.create(root, _("menu1.6"), text, currencies, currencies)
+        self.submit.configure(command=lambda: self.convertCurrency(self.value.get(), self.inCBox.get(), self.outCBox.get()))
+        self.status = ttk.Label(self.window)
+        self.grid()
+        self.status.grid(row=6, column=0, sticky=W)
+
+    def convertCurrency(self, value, currencyIn, currencyOut):
+        self.status["text"] = _("status01")
+        self.submit.config(state=DISABLED)
+        self.status.update_idletasks()
+        with urllib.urlopen("https://free.currencyconverterapi.com/api/v6/convert?q="+currencyIn+"_"+currencyOut) as url:
+            data = json.loads(url.read().decode())
+            self.result["text"] = str(round(float(value)*float(data["results"][currencyIn+"_"+currencyOut]["val"]), 2))
+            self.status["text"] = _("status02")
+            self.submit.config(state=NORMAL)
+
 class pyCalc(String):
     def __init__(self):
         self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
@@ -483,7 +505,8 @@ class pyCalc(String):
             _("menu1.2"): 'trigonometricFunc',
             _("menu1.3"): 'numberSystems',
             _("menu1.4"): 'temperature',
-            _("menu1.5"): 'length'
+            _("menu1.5"): 'length',
+            _("menu1.6"): 'currency'
         }
         for item in sorted(menuFunctionsItems.keys()):
             menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -529,6 +552,8 @@ class pyCalc(String):
             calc = TrigonometricFunctions(self.root)
         elif(function == 'screenSize'):
             calc = ScreenSizeCalculator(self.root)
+        elif(function == 'currency'):
+            calc = CurrencyConverter(self.root)
  
     def changeSettings(self, setting, value):
         if(setting == 'resultPreview'):

@@ -8,6 +8,7 @@
     <translation text="celsius">Celcjusz</translation>
     <translation text="centimeters">Centymetry</translation>
     <translation text="clear">Wyczyść</translation>
+    <translation text="currency">Waluta:</translation>
     <translation text="decimeters">Decymetry</translation>
     <translation text="degree">stopnie</translation>
     <translation text="diagonal">Przekątna:</translation>
@@ -29,6 +30,7 @@
     <translation text="menu1.3">Systemy liczbowe</translation>
     <translation text="menu1.4">Temperatura</translation>
     <translation text="menu1.5">Długość</translation>
+    <translation text="menu1.6">Waluta</translation>
     <translation text="menu2">Wzory</translation>
     <translation text="menu2.1">Pola figur</translation>
     <translation text="menu3">Opcje</translation>
@@ -48,6 +50,9 @@
     <translation text="radian">radiany</translation>
     <translation text="ratio">Proporcje:</translation>
     <translation text="result">Wynik:</translation>
+    <translation text="status01">Pobieranie kursu walut...</translation>
+    <translation text="status02">Gotowe!</translation>
+    <translation text="targetCurrency">Waluta docelowa:</translation>
     <translation text="targetSystem">System docelowy:</translation>
     <translation text="targetUnit">Jednostka docelowa:</translation>
     <translation text="unit">Jednostka:</translation>
