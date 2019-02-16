@@ -8,6 +8,7 @@ import math
 from configparser import ConfigParser
 import urllib.request as urllib
 import json
+from PIL import Image, ImageTk
 import lang
 _ = lang.get
 
@@ -72,6 +73,21 @@ class StandardWindow:
         self.outCBox.grid(row=2, column=1)
         self.result.grid(row=3, column=1)
         self.submit.grid(row=4, column=0, columnspan=2, pady=(10,0))
+
+class ImageViewer:
+    def __init__(self, root, title, image):
+        if(os.path.isfile(image)):
+            self.window = Toplevel(root)
+            self.window.resizable(False, False)
+            self.window.title(title)
+            self.window.iconbitmap('pycalc.ico')
+            self.file = Image.open(image)
+            self.image = ImageTk.PhotoImage(self.file)
+            self.label = Label(self.window, image=self.image)
+            self.label.image = self.image
+            self.label.pack()
+        else:
+            messagebox.showerror(_("error"), _("err3"))
 
 class LengthCalculator(StandardWindow, String):
     def __init__(self, root):
@@ -482,14 +498,14 @@ class pyCalc(String):
         menu.add_cascade(label=_("menu3"), menu=menuOptions)
         menu.add_cascade(label=_("menu4"), menu=menuHelp)
 
-        menuFormulas.add_cascade(label=_("menu2.1"), menu=menuArea, state="disabled")
+        menuFormulas.add_cascade(label=_("menu2.1"), menu=menuArea)
         menuAreaItems = {
-            _("rectangle"): "rectangleArea",
-            _("parallelogram"): "parallelogramArea",
-            _("triangle"): "triangleArea",
-            _("rhomboid"): "rhomboidArea",
-            _("trapezium"): "trapeziumArea",
-            _("circle"): "circleArea"
+            _("rectangle"): "rectangle",
+            _("parallelogram"): "parallelogram",
+            _("triangle"): "triangle",
+            _("rhomboid"): "rhomboid",
+            _("trapezium"): "trapezium",
+            _("circle"): "circle"
         }
         for item in sorted(menuAreaItems.keys()):
             menuArea.add_command(label=item, command=lambda func=menuAreaItems[item]: self.function(func))
@@ -542,18 +558,30 @@ class pyCalc(String):
         messagebox.showinfo(_("menu3.1"), ("pyCalc v."+self.version+"\nGNU AGPL v.3.0\nhttps://github.com/Programista3/pyCalc"))
 
     def function(self, function):
-        if(function == 'length'):
+        if(function == "length"):
             calc = LengthCalculator(self.root)
-        elif(function == 'temperature'):
+        elif(function == "temperature"):
             calc = TemperatureCalculator(self.root)
-        elif(function == 'numberSystems'):
+        elif(function == "numberSystems"):
             calc = NumberSystemCalculator(self.root)
-        elif(function == 'trigonometricFunc'):
+        elif(function == "trigonometricFunc"):
             calc = TrigonometricFunctions(self.root)
-        elif(function == 'screenSize'):
+        elif(function == "screenSize"):
             calc = ScreenSizeCalculator(self.root)
-        elif(function == 'currency'):
+        elif(function == "currency"):
             calc = CurrencyConverter(self.root)
+        elif(function == "parallelogram"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("parallelogram"), "images/parallelogram.png")
+        elif(function == "rectangle"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("rectangle"), "images/rectangle.png")
+        elif(function == "triangle"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("triangle"), "images/triangle.png")
+        elif(function == "rhomboid"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("rhomboid"), "images/rhomboid.png")
+        elif(function == "trapezium"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("trapezium"), "images/trapezium.png")
+        elif(function == "circle"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("circle"), "images/circle.png")
  
     def changeSettings(self, setting, value):
         if(setting == 'resultPreview'):
