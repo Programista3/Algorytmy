@@ -3,7 +3,7 @@
 # pyCalc
 Calculator made in Python using `tkinter`  
 pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)<br><br><br>
-![screen](https://github.com/Programista3/pyCalc/blob/master/images/pyCalc3.png?raw=true)
+![screen](https://github.com/Programista3/pyCalc/blob/master/images/pyCalc3.png?1)
 ## Functions
 - Basic calculator
 - Screen size calculator
