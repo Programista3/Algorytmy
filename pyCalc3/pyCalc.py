@@ -503,8 +503,8 @@ class pyCalc(String):
             _("rectangle"): "rectangle",
             _("parallelogram"): "parallelogram",
             _("triangle"): "triangle",
-            _("rhomboid"): "rhomboid",
-            _("trapezium"): "trapezium",
+            _("rhombus"): "rhombus",
+            _("trapezoid"): "trapezoid",
             _("circle"): "circle"
         }
         for item in sorted(menuAreaItems.keys()):
@@ -576,10 +576,10 @@ class pyCalc(String):
             image = ImageViewer(self.root, _("formulas")+" - "+_("rectangle"), "images/rectangle.png")
         elif(function == "triangle"):
             image = ImageViewer(self.root, _("formulas")+" - "+_("triangle"), "images/triangle.png")
-        elif(function == "rhomboid"):
-            image = ImageViewer(self.root, _("formulas")+" - "+_("rhomboid"), "images/rhomboid.png")
-        elif(function == "trapezium"):
-            image = ImageViewer(self.root, _("formulas")+" - "+_("trapezium"), "images/trapezium.png")
+        elif(function == "rhombus"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("rhombus"), "images/rhombus.png")
+        elif(function == "trapezoid"):
+            image = ImageViewer(self.root, _("formulas")+" - "+_("trapezoid"), "images/trapezoid.png")
         elif(function == "circle"):
             image = ImageViewer(self.root, _("formulas")+" - "+_("circle"), "images/circle.png")
  
