@@ -11,6 +11,8 @@ pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Pol
 - Number system converter
 - Temperature converter
 - Length converter
+- Currency converter
+- Math formulas
 ## Source
 ### Requirements
 - [pyLang](https://github.com/Programista3/pyLang)
