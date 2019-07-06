@@ -15,6 +15,6 @@ pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Pol
 - Math formulas
 ## Source
 ### Requirements
-- [pyLang](https://github.com/Programista3/pyLang)
+- [python-lang](https://github.com/Programista3/python-lang)
 
 <br>Code tested in Windows 10 with Python 3.6.6
