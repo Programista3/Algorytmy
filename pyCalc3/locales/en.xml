@@ -4,6 +4,8 @@
     <translation text="16ns">hexa decimal</translation>
     <translation text="2ns">binary</translation>
     <translation text="8ns">octal</translation>
+	<translation text="actual version">Actual version:</translation>
+	<translation text="available version">Available version:</translation>
     <translation text="calculate">Calculate</translation>
     <translation text="celsius">Celsius</translation>
     <translation text="centimeters">Centimeters</translation>
@@ -13,6 +15,7 @@
     <translation text="decimeters">Decimeters</translation>
     <translation text="degree">degrees</translation>
     <translation text="diagonal">Diagonal:</translation>
+	<translation text="download update">Do you want to download new version?</translation>
     <translation text="err1">Cannot divide by zero!</translation>
     <translation text="err2">Incorrect value</translation>
     <translation text="err3">File not found!</translation>
@@ -50,11 +53,13 @@
     <translation text="menu3.1.2">English</translation>
     <translation text="menu4">Help</translation>
     <translation text="menu4.1">pyCalc - Informations</translation>
+	<translation text="menu4.2">Check for updates</translation>
     <translation text="meters">Meters</translation>
     <translation text="miles">Miles</translation>
     <translation text="millimeters">Millimeters</translation>
     <translation text="nautical miles">Nautical miles</translation>
     <translation text="number">Number:</translation>
+	<translation text="no">No</translation>
     <translation text="parallelogram">Parallelogram</translation>
     <translation text="radian">radians</translation>
     <translation text="ratio">Aspect Ratio:</translation>
@@ -69,7 +74,9 @@
     <translation text="trapezoid">Trapezoid</translation>
     <translation text="triangle">Triangle</translation>
     <translation text="unit">Unit:</translation>
+	<translation text="update available">Update is available</translation>
     <translation text="value">Value:</translation>
     <translation text="width">Width:</translation>
     <translation text="yards">Yards</translation>
+	<translation text="yes">Yes</translation>
 </lang>

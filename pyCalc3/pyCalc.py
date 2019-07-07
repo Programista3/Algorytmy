@@ -9,6 +9,9 @@ from configparser import ConfigParser
 import urllib.request as urllib
 import json
 from PIL import Image, ImageTk
+from bs4 import BeautifulSoup
+import threading
+import webbrowser
 import lang
 _ = lang.get
 
@@ -440,6 +443,8 @@ class pyCalc(String):
 		self.languages = ['pl','en']
 		self.lang = "pl"
 		self.end = False
+		check = threading.Thread(target=self.checkForUpdates)
+		check.start()
 		self.checkSettings()
 		self.startGui()
 
@@ -534,6 +539,7 @@ class pyCalc(String):
 		menuOptions.add_checkbutton(label=_("menu3.4"), onvalue=True, offvalue=False, variable=vShowHistory, command=lambda: self.changeSettings('history', vShowHistory.get()))
 		menuOptions.add_checkbutton(label=_("menu3.5"), onvalue=True, offvalue=False, variable=self.vContinuity, command=lambda: self.changeSettings('continuity', self.vContinuity.get()))
 		menuHelp.add_command(label=_("menu4.1"), command=self.info)
+		menuHelp.add_command(label=_("menu4.2"), command=self.checkForUpdates)
 		menuFunctionsItems = {
 			_("menu1.1"): 'screenSize',
 			_("menu1.2"): 'trigonometricFunc',
@@ -892,5 +898,24 @@ class pyCalc(String):
 		with open(path, 'w') as cfgfile:
 			config.write(cfgfile)
 			cfgfile.close()
+
+	def checkForUpdates(self):
+		latest = urllib.urlopen('https://github.com/Programista3/pyCalc/releases/latest')
+		parse = BeautifulSoup(latest, 'html.parser')
+		version = parse.select_one('div.release-header > div > div > a').text
+		if(version > self.version):
+			window = Toplevel(self.root, padx=20, pady=10)
+			window.resizable(False, False)
+			window.transient(self.root)
+			window.title(_("update available"))
+			window.iconbitmap('pycalc.ico')
+			label = Label(window, text=_("actual version")+'  '+self.version+'\n'+_("available version")+'  '+version+'\r\n'+_("download update"), justify=LEFT)
+			label.pack(pady=(0, 10))
+			buttons = ttk.Frame(window)
+			buttons.pack()
+			btnYes = ttk.Button(buttons, text=_("yes"), command=lambda: (webbrowser.open('https://github.com/Programista3/pyCalc/releases/latest'), window.destroy))
+			btnYes.pack(side=LEFT, padx=(0, 10))
+			btnNo = ttk.Button(buttons, text=_("no"), command=window.destroy)
+			btnNo.pack(side=LEFT)
 
 calc = pyCalc()

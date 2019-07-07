@@ -4,6 +4,8 @@
     <translation text="16ns">szesnastkowy</translation>
     <translation text="2ns">dwójkowy</translation>
     <translation text="8ns">ósemkowy</translation>
+	<translation text="actual version">Aktualna wersja:</translation>
+	<translation text="available version">Dostępna wersja:</translation>
     <translation text="calculate">Oblicz</translation>
     <translation text="celsius">Celcjusz</translation>
     <translation text="centimeters">Centymetry</translation>
@@ -13,6 +15,7 @@
     <translation text="decimeters">Decymetry</translation>
     <translation text="degree">stopnie</translation>
     <translation text="diagonal">Przekątna:</translation>
+	<translation text="download update">Czy chcesz pobrać nową wersję?</translation>
     <translation text="err1">Nie można dzielić przez zero</translation>
     <translation text="err2">Nieprawidłowa wartość</translation>
     <translation text="err3">Nie odnaleziono pliku!</translation>
@@ -50,11 +53,13 @@
     <translation text="menu3.1.2">Angielski</translation>
     <translation text="menu4">Pomoc</translation>
     <translation text="menu4.1">pyCalc - Informacje</translation>
+	<translation text="menu4.2">Sprawdź dostępność aktualizacji</translation>
     <translation text="meters">Metry</translation>
     <translation text="miles">Mile</translation>
     <translation text="millimeters">Milimetry</translation>
     <translation text="nautical miles">Mile morskie</translation>
     <translation text="number">Liczba:</translation>
+	<translation text="no">Nie</translation>
     <translation text="parallelogram">Równoległobok</translation>
     <translation text="radian">radiany</translation>
     <translation text="ratio">Proporcje:</translation>
@@ -69,7 +74,9 @@
     <translation text="trapezoid">Trapez</translation>
     <translation text="triangle">Trójkąt</translation>
     <translation text="unit">Jednostka:</translation>
+	<translation text="update available">Dostępna aktualizacja</translation>
     <translation text="value">Wartość:</translation>
     <translation text="width">Szerokość:</translation>
     <translation text="yards">Jardy</translation>
+	<translation text="yes">Tak</translation>
 </lang>
