@@ -37,11 +37,15 @@
     <translation text="menu2">Wzory</translation>
     <translation text="menu2.1">Pola i obwody figur</translation>
 	<translation text="menu2.2">Wartość bezwzględna</translation>
+	<translation text="menu2.3">Skrócone mnożenie</translation>
+	<translation text="menu2.4">Potęgi</translation>
+	<translation text="menu2.5">Pierwiastki</translation>
     <translation text="menu3">Opcje</translation>
     <translation text="menu3.1">Język</translation>
     <translation text="menu3.2">Motyw</translation>
     <translation text="menu3.3">Pokaż podgląd wyniku</translation>
     <translation text="menu3.4">Pokaż historię</translation>
+	<translation text="menu3.5">Ciągłość działań</translation>
     <translation text="menu3.1.1">Polski</translation>
     <translation text="menu3.1.2">Angielski</translation>
     <translation text="menu4">Pomoc</translation>

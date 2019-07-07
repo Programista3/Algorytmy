@@ -37,11 +37,15 @@
     <translation text="menu2">Formulas</translation>
     <translation text="menu2.1">Area and perimeter of shapes</translation>
 	<translation text="menu2.2">Absolute value</translation>
+	<translation text="menu2.3">Short multiplication</translation>
+	<translation text="menu2.4">Exponents</translation>
+	<translation text="menu2.5">Radicals</translation>
     <translation text="menu3">Options</translation>
     <translation text="menu3.1">Language</translation>
     <translation text="menu3.2">Theme</translation>
     <translation text="menu3.3">Show result preview</translation>
     <translation text="menu3.4">Show history</translation>
+	<translation text="menu3.5">Continuity of calculations</translation>
     <translation text="menu3.1.1">Polish</translation>
     <translation text="menu3.1.2">English</translation>
     <translation text="menu4">Help</translation>

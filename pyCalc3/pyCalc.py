@@ -432,10 +432,11 @@ class pyCalc(String):
 			},
 			'Settings': {
 				'resultPreview': 'true',
-				'history': 'false'
+				'history': 'false',
+				'continuityOfCalculations': 'true'
 			}
 		}
-		self.version = "3.1.12"
+		self.version = "3.1.13"
 		self.languages = ['pl','en']
 		self.lang = "pl"
 		self.end = False
@@ -460,12 +461,13 @@ class pyCalc(String):
 		vLang = StringVar(value=self.lang)
 		vShowPreview = BooleanVar(value=True)
 		vShowHistory = BooleanVar(value=False)
+		self.vContinuity = BooleanVar(value=True)
 
 		config = ConfigParser()
 		cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
 		if(os.path.isfile(cfgpath)):
 			config.read(cfgpath)
-			if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names() and config['Settings']['resultPreview'] in ['true','false','True','False','0','1'] and config['Settings']['history'] in ['true','false','True','False','0','1']):
+			if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names() and config['Settings']['resultPreview'] in ['true','false','True','False','0','1'] and config['Settings']['history'] in ['true','false','True','False','0','1'] and config['Settings']['continuityOfCalculations'] in ['true','false','True','False','0','1']):
 				self.lang = config['Personalization']['language']
 				lang.select(config['Personalization']['language'])
 				vLang.set(self.lang)
@@ -479,6 +481,10 @@ class pyCalc(String):
 					vShowHistory.set(True)
 				else:
 					vShowHistory.set(False)
+				if(config['Settings']['continuityOfCalculations'] in ['true', 'True', '1']):
+					self.vContinuity.set(True)
+				else:
+					self.vContinuity.set(False)
 			else:
 				self.createDefaultSettingsFile()
 		else:
@@ -500,7 +506,10 @@ class pyCalc(String):
 
 		menuFormulasItems = {
 			_("menu2.1"): menuArea,
-			_("menu2.2"): "absolute-value"
+			_("menu2.2"): "absolute-value",
+			_("menu2.3"): "short-multiplication",
+			_("menu2.4"): "exponents",
+			_("menu2.5"): "radicals"
 		}
 		for item in sorted(menuFormulasItems.keys()):
 			if(type(menuFormulasItems[item]) is str):
@@ -523,6 +532,7 @@ class pyCalc(String):
 		menuOptions.add_separator()
 		menuOptions.add_checkbutton(label=_("menu3.3"), onvalue=True, offvalue=False, variable=vShowPreview, command=lambda: self.changeSettings('resultPreview', vShowPreview.get()))
 		menuOptions.add_checkbutton(label=_("menu3.4"), onvalue=True, offvalue=False, variable=vShowHistory, command=lambda: self.changeSettings('history', vShowHistory.get()))
+		menuOptions.add_checkbutton(label=_("menu3.5"), onvalue=True, offvalue=False, variable=self.vContinuity, command=lambda: self.changeSettings('continuity', self.vContinuity.get()))
 		menuHelp.add_command(label=_("menu4.1"), command=self.info)
 		menuFunctionsItems = {
 			_("menu1.1"): 'screenSize',
@@ -592,6 +602,12 @@ class pyCalc(String):
 			image = ImageViewer(self.root, _("formulas")+" - "+_("circle"), "images/circle.png")
 		elif(function == "absolute-value"):
 			image = ImageViewer(self.root, _("menu2.2"), "images/absolute_value.png")
+		elif(function == "short-multiplication"):
+			image = ImageViewer(self.root, _("menu2.3"), "images/short_multiplication.png")
+		elif(function == "exponents"):
+			image = ImageViewer(self.root, _("menu2.4"), "images/exponents.png")
+		elif(function == "radicals"):
+			iamge = ImageViewer(self.root, _("menu2.5"), "images/radicals.png")
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):
@@ -657,7 +673,7 @@ class pyCalc(String):
 				items.pop()
 
 	def click(self, btn):
-		if(self.end):
+		if(self.vContinuity.get() == False and self.end):
 			self.textbox['text'] = "0"
 			self.end = False
 		if(btn == '='):
