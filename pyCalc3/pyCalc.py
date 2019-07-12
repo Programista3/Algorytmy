@@ -115,59 +115,18 @@ class LengthCalculator(StandardWindow, Tools):
 	def __init__(self, root):
 		units = [_("millimeters"),_("centimeters"),_("decimeters"),_("meters"),_("kilometers"),_("inches"),_("foots"),_("yards"),_("miles"),_("nautical miles")]
 		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.values = [Decimal(str(i)) for i in [0.001, 0.01, 0.1, 1, 1000, 0.0254, 0.3048, 0.9144, 1609.344, 1852]]
 		self.create(root, _("menu1.5"), text, units, units)
-		self.submit.configure(command=lambda: self.convertLength(self.value.get(), self.inCBox.current(), self.outCBox.current()))
-		self.value.bind("<Return>", lambda event: self.convertLength(self.value.get(),self.inCBox.current(),self.outCBox.current()))
-		self.inCBox.bind("<Return>", lambda event: self.convertLength(self.value.get(),self.inCBox.current(),self.outCBox.current()))
-		self.outCBox.bind("<Return>", lambda event: self.convertLength(self.value.get(),self.inCBox.current(),self.outCBox.current()))
+		self.bind(self.convertLength)
 		self.grid()
 
 	def convertLength(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
 		if(self.isNumber(value)):
-			value = float(value)
-			if(unitIn != unitOut):
-				if(unitIn == 0):
-					value /= 1000
-				elif(unitIn == 1):
-					value /= 100
-				elif(unitIn == 2):
-					value /= 10
-				elif(unitIn == 4):
-					value *= 1000
-				elif(unitIn == 5):
-					value *= 0.0254
-				elif(unitIn == 6):
-					value *= 0.3048
-				elif(unitIn == 7):
-					value *= 0.9144
-				elif(unitIn == 8):
-					value *= 1609.344
-				elif(unitIn == 9):
-					value *= 1852
-				if(unitOut == 0):
-					value *= 1000
-				elif(unitOut == 1):
-					value *= 100
-				elif(unitOut == 2):
-					value *= 10
-				elif(unitOut == 4):
-					value /= 1000
-				elif(unitOut == 5):
-					value *= 254
-				elif(unitOut == 6):
-					value /= 0.3048
-				elif(unitOut == 7):
-					value /= 0.9144
-				elif(unitOut == 8):
-					value /= 1609.344
-				elif(unitOut == 9):
-					value /= 1852
-			if(value.is_integer()):
-				value = int(value)
-			else:
-				value = round(value, 10)
-			self.result['text'] = value
+			value = Decimal(value)
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
@@ -176,30 +135,23 @@ class TemperatureCalculator(StandardWindow, Tools):
 		units = [_("celsius"),_("fahrenheit"),_("kelvin")]
 		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
 		self.create(root, _("menu1.4"), text, units, units)
-		self.submit.configure(command=lambda: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
-		self.value.bind("<Return>", lambda event: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
-		self.inCBox.bind("<Return>", lambda event: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
-		self.outCBox.bind("<Return>", lambda event: self.convertTemperature(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+		self.bind(self.convertTemperature)
 		self.grid()
 
 	def convertTemperature(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
 		if(self.isNumber(value)):
-			value = float(value)
+			value = Decimal(value)
 			if(unitIn != unitOut):
 				if(unitIn == 1):
-					value = 5/9*(value-32)
+					value = Decimal('5')/9*(value-32)
 				elif(unitIn == 2):
-					value -= 273.15
+					value -= Decimal('273.15')
 				if(unitOut == 1):
-					value = 32+9/5*value
+					value = 32+Decimal('9')/5*value
 				elif(unitOut == 2):
-					value += 273.15
-			if(value.is_integer()):
-				value = int(value)
-			else:
-				value = round(value, 10)
-			self.result['text'] = value
+					value += Decimal('273.15')
+			self.result['text'] = self.normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
@@ -208,10 +160,7 @@ class NumberSystemCalculator(StandardWindow):
 		text = [_("number"),_("inputSystem"),_("targetSystem"),_("result")]
 		systems = [_("2ns"),_("8ns"),_("10ns"),_("16ns")]
 		self.create(root, _("menu1.3"), text, systems, systems)
-		self.submit.configure(command=lambda: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
-		self.value.bind("<Return>", lambda event: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
-		self.inCBox.bind("<Return>", lambda event: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
-		self.outCBox.bind("<Return>", lambda event: self.convertNumberSystem(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+		self.bind(self.convertNumberSystem)
 		self.grid()
 	
 	def convertNumberSystem(self, number, systemIn, systemOut):
@@ -254,16 +203,13 @@ class TrigonometricFunctions(StandardWindow, Tools):
 		functions = ['sin','cos','tg','ctg']
 		units = [_("degree"),_("radian")]
 		self.create(root, _("menu1.2"), text, functions, units)
-		self.submit.configure(command=lambda: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
-		self.value.bind("<Return>", lambda event: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
-		self.inCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
-		self.outCBox.bind("<Return>", lambda event: self.calcTrigonometricFunc(self.value.get(), self.inCBox.get(), self.outCBox.current()))
+		self.bind(self.calcTrigonometricFunc, self.value.get, self.inCBox.get, self.outCBox.current)
 		self.grid()
 
 	def calcTrigonometricFunc(self, value, function, unit):
 		value = value.replace(',','.')
 		if(self.isNumber(value)):
-			value = float(value)
+			value = Decimal(value)
 			if(unit == 0):
 				value = math.radians(value)
 			if(function == 'sin'):
@@ -340,17 +286,17 @@ class ScreenSizeCalculator(Tools):
 		self.reset.grid(row=4, column=2, columnspan=2, pady=(10,0))
 
 	def calcScreenSizeDiagonal(self, diagonal, ratio):
-		result = ((ratio[0]**2+ratio[1]**2)**0.5)/float(diagonal)
+		result = ((ratio[0]**2+ratio[1]**2)**Decimal(0.5))/diagonal
 		return (round(ratio[0]/result,2), round(ratio[1]/result,2))
 
 	def calcScreenSizeWidth(self, width, ratio):
 		height = round(width*ratio[1]/ratio[0],2)
-		diagonal = round((width**2+height**2)**0.5,2)
+		diagonal = round((width**2+height**2)**Decimal(0.5),2)
 		return (height, diagonal)
 
 	def calcScreenSizeHeight(self, height, ratio):
 		width = round(height*ratio[0]/ratio[1],2)
-		diagonal = round((width**2+height**2)**0.5,2)
+		diagonal = round((width**2+height**2)**Decimal(0.5),2)
 		return (width, diagonal)
 
 	def clearScreenSizeForm(self):
@@ -359,65 +305,65 @@ class ScreenSizeCalculator(Tools):
 
 	def calcScreenSize(self, index):
 		if(index != None):
-			ratio = list(map(int, self.ratioCBox.get().split(':')))
+			ratio = list(map(Decimal, self.ratioCBox.get().split(':')))
 			if(index == 0):
 				if(self.isNumber(self.entry[0].get())):
-					result = self.calcScreenSizeDiagonal(float(self.entry[0].get()), ratio)
+					result = self.calcScreenSizeDiagonal(Decimal(self.entry[0].get()), ratio)
 					for i in range(1,6):
 						self.entry[i].delete(0, END)
 					self.entry[1].insert(0, result[0])
 					self.entry[2].insert(0, result[1])
-					self.entry[3].insert(0, round(float(self.entry[0].get())*2.54,2))
-					self.entry[4].insert(0, round(result[0]*2.54,2))
-					self.entry[5].insert(0, round(result[1]*2.54,2))
+					self.entry[3].insert(0, round(Decimal(self.entry[0].get())*Decimal(2.54),2))
+					self.entry[4].insert(0, round(result[0]*Decimal(2.54),2))
+					self.entry[5].insert(0, round(result[1]*Decimal(2.54),2))
 			elif(index == 1):
 				if(self.isNumber(self.entry[1].get())):
-					result = self.calcScreenSizeWidth(float(self.entry[1].get()), ratio)
+					result = self.calcScreenSizeWidth(Decimal(self.entry[1].get()), ratio)
 					for i in [0,2,3,4,5]:
 						self.entry[i].delete(0, END)
 					self.entry[0].insert(0, result[1])
 					self.entry[2].insert(0, result[0])
-					self.entry[3].insert(0, round(result[1]*2.54,2))
-					self.entry[4].insert(0, round(float(self.entry[1].get())*2.54,2))
-					self.entry[5].insert(0, round(result[0]*2.54,2))
+					self.entry[3].insert(0, round(result[1]*Decimal(2.54),2))
+					self.entry[4].insert(0, round(Decimal(self.entry[1].get())*Decimal(2.54),2))
+					self.entry[5].insert(0, round(result[0]*Decimal(2.54),2))
 			elif(index == 2):
 				if(self.isNumber(self.entry[2].get())):
-					result = self.calcScreenSizeHeight(float(self.entry[2].get()), ratio)
+					result = self.calcScreenSizeHeight(Decimal(self.entry[2].get()), ratio)
 					for i in [0,1,3,4,5]:
 						self.entry[i].delete(0, END)
 					self.entry[0].insert(0, result[1])
 					self.entry[1].insert(0, result[0])
-					self.entry[3].insert(0, round(result[1]*2.54,2))
-					self.entry[4].insert(0, round(result[0]*2.54,2))
-					self.entry[5].insert(0, round(float(self.entry[2].get())*2.54,2))
+					self.entry[3].insert(0, round(result[1]*Decimal(2.54),2))
+					self.entry[4].insert(0, round(result[0]*Decimal(2.54),2))
+					self.entry[5].insert(0, round(Decimal(self.entry[2].get())*Decimal(2.54),2))
 			elif(index == 3):
 				if(self.isNumber(self.entry[3].get())):
-					result = self.calcScreenSizeDiagonal(self.entry[3].get(), ratio)
+					result = self.calcScreenSizeDiagonal(Decimal(self.entry[3].get()), ratio)
 					for i in [0,1,2,4,5]:
 						self.entry[i].delete(0, END)
-					self.entry[0].insert(0, round(float(self.entry[3].get())/2.54,2))
-					self.entry[1].insert(0, round(result[0]/2.54,2))
-					self.entry[2].insert(0, round(result[1]/2.54,2))
+					self.entry[0].insert(0, round(Decimal(self.entry[3].get())/Decimal(2.54),2))
+					self.entry[1].insert(0, round(result[0]/Decimal(2.54),2))
+					self.entry[2].insert(0, round(result[1]/Decimal(2.54),2))
 					self.entry[4].insert(0, round(result[0],2))
 					self.entry[5].insert(0, round(result[1],2))
 			elif(index == 4):
 				if(self.isNumber(self.entry[4].get())):
-					result = self.calcScreenSizeWidth(float(self.entry[4].get()), ratio)
+					result = self.calcScreenSizeWidth(Decimal(self.entry[4].get()), ratio)
 					for i in [0,1,2,3,5]:
 						self.entry[i].delete(0, END)
-					self.entry[0].insert(0, round(result[1]/2.54,2))
-					self.entry[1].insert(0, round(float(self.entry[4].get())/2.54,2))
-					self.entry[2].insert(0, round(result[0]/2.54,2))
+					self.entry[0].insert(0, round(result[1]/Decimal(2.54),2))
+					self.entry[1].insert(0, round(Decimal(self.entry[4].get())/Decimal(2.54),2))
+					self.entry[2].insert(0, round(result[0]/Decimal(2.54),2))
 					self.entry[3].insert(0, result[1])
 					self.entry[5].insert(0, result[0])
 			elif(index == 5):
 				if(self.isNumber(self.entry[5].get())):
-					result = self.calcScreenSizeHeight(float(self.entry[5].get()), ratio)
+					result = self.calcScreenSizeHeight(Decimal(self.entry[5].get()), ratio)
 					for i in [0,1,2,3,4]:
 						self.entry[i].delete(0, END)
-					self.entry[0].insert(0, round(result[1]/2.54,2))
-					self.entry[1].insert(0, round(result[0]/2.54,2))
-					self.entry[2].insert(0, round(float(self.entry[5].get())/2.54,2))
+					self.entry[0].insert(0, round(result[1]/Decimal(2.54),2))
+					self.entry[1].insert(0, round(result[0]/Decimal(2.54),2))
+					self.entry[2].insert(0, round(Decimal(self.entry[5].get())/Decimal(2.54),2))
 					self.entry[3].insert(0, result[1])
 					self.entry[4].insert(0, result[0])
 
