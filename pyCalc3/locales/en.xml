@@ -12,6 +12,7 @@
     <translation text="circle">Circle</translation>
     <translation text="clear">Clear</translation>
     <translation text="currency">Currency:</translation>
+	<translation text="days">Days</translation>
     <translation text="decimeters">Decimeters</translation>
     <translation text="degree">degrees</translation>
     <translation text="diagonal">Diagonal:</translation>
@@ -25,6 +26,7 @@
     <translation text="formulas">Formulas</translation>
     <translation text="function">Function:</translation>
     <translation text="height">Height:</translation>
+	<translation text="hours">Hours</translation>
     <translation text="inch">inches</translation>
     <translation text="inches">Inches</translation>
     <translation text="inputSystem">Input system:</translation>
@@ -37,6 +39,7 @@
     <translation text="menu1.4">Temperature</translation>
     <translation text="menu1.5">Length</translation>
     <translation text="menu1.6">Currency</translation>
+	<translation text="menu1.7">Time</translation>
     <translation text="menu2">Formulas</translation>
     <translation text="menu2.1">Area and perimeter of shapes</translation>
 	<translation text="menu2.2">Absolute value</translation>
@@ -55,8 +58,13 @@
     <translation text="menu4.1">pyCalc - Informations</translation>
 	<translation text="menu4.2">Check for updates</translation>
     <translation text="meters">Meters</translation>
+	<translation text="microseconds">Microseconds</translation>
     <translation text="miles">Miles</translation>
     <translation text="millimeters">Millimeters</translation>
+	<translation text="milliseconds">Milliseconds</translation>
+	<translation text="minutes">Minutes</translation>
+	<translation text="months">Months</translation>
+	<translation text="nanoseconds">Nanoseconds</translation>
     <translation text="nautical miles">Nautical miles</translation>
     <translation text="number">Number:</translation>
 	<translation text="no">No</translation>
@@ -66,6 +74,7 @@
     <translation text="rectangle">Rectangle</translation>
     <translation text="result">Result:</translation>
     <translation text="rhombus">Rhombus</translation>
+	<translation text="seconds">Seconds</translation>
     <translation text="status01">Downloading exchange rate...</translation>
     <translation text="status02">Ready!</translation>
     <translation text="targetCurrency">Target Currency:</translation>
@@ -76,7 +85,9 @@
     <translation text="unit">Unit:</translation>
 	<translation text="update available">Update is available</translation>
     <translation text="value">Value:</translation>
+	<translation text="weeks">Weeks</translation>
     <translation text="width">Width:</translation>
     <translation text="yards">Yards</translation>
+	<translation text="years">Years</translation>
 	<translation text="yes">Yes</translation>
 </lang>

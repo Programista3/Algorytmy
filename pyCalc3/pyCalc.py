@@ -12,6 +12,7 @@ from PIL import Image, ImageTk
 from bs4 import BeautifulSoup
 import threading
 import webbrowser
+from decimal import *
 import lang
 _ = lang.get
 
@@ -38,7 +39,7 @@ class Stack:
 	def get(self):
 		return self.stack[::-1]
 
-class String:
+class Tools:
 	def isNumber(self, str):
 		if(str.isdigit()):
 			return 1
@@ -48,6 +49,11 @@ class String:
 				return 2
 			except ValueError:
 				return 0
+	
+	def normalizeFraction(self, d):
+		normalized = d.normalize()
+		sign, digit, exponent = normalized.as_tuple()
+		return normalized if exponent <= 0 else normalized.quantize(1)
 
 class StandardWindow:
 	def create(self, root, title, text, units1, units2):
@@ -66,6 +72,19 @@ class StandardWindow:
 		self.outCBox.current(1)
 		self.result = ttk.Label(self.frame)
 		self.submit = ttk.Button(self.frame, text=_("calculate"))
+
+	def bind(self, function, *args):
+		if(len(args) >= 3):
+			self.submit.configure(command=lambda: function(args[0](), args[1](), args[2]()))
+			self.value.bind("<Return>", lambda event: function(args[0](), args[1](), args[2]()))
+			self.inCBox.bind("<Return>", lambda event: function(args[0](), args[1](), args[2]()))
+			self.outCBox.bind("<Return>", lambda event: function(args[0](), args[1](), args[2]()))
+		else:
+			self.submit.configure(command=lambda: function(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+			self.value.bind("<Return>", lambda event: function(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+			self.inCBox.bind("<Return>", lambda event: function(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+			self.outCBox.bind("<Return>", lambda event: function(self.value.get(), self.inCBox.current(), self.outCBox.current()))
+
 
 	def grid(self):
 		self.frame.grid(row=0, column=0, rowspan=5, columnspan=2, padx=20, pady=20)
@@ -92,7 +111,7 @@ class ImageViewer:
 		else:
 			messagebox.showerror(_("error"), _("err3"))
 
-class LengthCalculator(StandardWindow, String):
+class LengthCalculator(StandardWindow, Tools):
 	def __init__(self, root):
 		units = [_("millimeters"),_("centimeters"),_("decimeters"),_("meters"),_("kilometers"),_("inches"),_("foots"),_("yards"),_("miles"),_("nautical miles")]
 		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
@@ -152,7 +171,7 @@ class LengthCalculator(StandardWindow, String):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class TemperatureCalculator(StandardWindow, String):
+class TemperatureCalculator(StandardWindow, Tools):
 	def __init__(self, root):
 		units = [_("celsius"),_("fahrenheit"),_("kelvin")]
 		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
@@ -229,7 +248,7 @@ class NumberSystemCalculator(StandardWindow):
 		elif(systemOut == 3):
 			self.result['text'] = str(hex(number))[2:]
 
-class TrigonometricFunctions(StandardWindow, String):
+class TrigonometricFunctions(StandardWindow, Tools):
 	def __init__(self, root):
 		text = [_("function"),_("value"),_("unit"),_("result")]
 		functions = ['sin','cos','tg','ctg']
@@ -259,7 +278,7 @@ class TrigonometricFunctions(StandardWindow, String):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class ScreenSizeCalculator(String):
+class ScreenSizeCalculator(Tools):
 	def __init__(self, root):
 		self.root = root
 		self.ssActiveEntry = None
@@ -410,8 +429,8 @@ class CurrencyConverter(StandardWindow):
 		currencies = ["AED","AFN","ALL","AMD","ANG","AQA","ARS","AUD","AWG","AZN","BAM","BBD","BDT","BGN","BHD","BIF","BMD","BND","BOB","BRL","BSD","BTC","BTN","BWP","BYN","BZD","CAD","CDF","CHF","CLF","CLP","CNH","CNY","COP","CRC","CUC","CUP","CVE","CZK","DJF","DKK","DOP","DZD","EGP","ERN","ETB","EUR","FJD","FKP","GBP","GEL","GGP","GHS","GIP","GMD","GNF","GTQ","GYD","HKD","HNL","HRK","HTG","HUF","IDR","ILS","IMP","INR","IQD","IRR","ISK","JEP","JMD","JOD","JPY","KES","KGS","KHR","KMF","KPW","KRW","KWD","KYD","KZT","LAK","LBP","LKR","LRD","LSL","LYD","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MRO","MRU","MUR","MVR","MWK","MXN","MYR","MZN","NAD","NGN","NIO","NOK","NPR","NZD","OMR","PAB","PEN","PGK","PHP","PKR","PLN","PYG","QAR","RON","RSD","RUB","RWF","SAR","SBD","SCR","SDG","SEK","SGD","SHP","SLL","SOS","SRD","SSP","STD","STN","SVC","SYP","SZL","THB","TJS","TMT","TND","TOP","TRY","TTD","TWD","TZS","UAH","UGX","USD","UYU","UZS","VEF","VES","VND","VUV","WST","XAF","XAG","XAU","XCD","XDR","XOF","XPD","XPF","XPT","YER","ZAR","ZMW","ZWL"]
 		text = [_("value"),_("currency"),_("targetCurrency"),_("result")]
 		self.create(root, _("menu1.6"), text, currencies, currencies)
-		self.submit.configure(command=lambda: self.convertCurrency(self.value.get(), self.inCBox.get(), self.outCBox.get()))
 		self.status = ttk.Label(self.window)
+		self.bind(self.convertCurrency, self.value.get, self.inCBox.get, self.outCBox.get)
 		self.grid()
 		self.status.grid(row=6, column=0, sticky=W)
 
@@ -425,7 +444,26 @@ class CurrencyConverter(StandardWindow):
 			self.status["text"] = _("status02")
 			self.submit.config(state=NORMAL)
 
-class pyCalc(String):
+class TimeConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("nanoseconds"),_("microseconds"),_("milliseconds"),_("seconds"),_("minutes"),_("hours"),_("days"),_("weeks"),_("months"),_("years")]
+		self.values = [Decimal(str(i)) for i in [0.000000001, 0.000001, 0.001, 1, 60, 3600, 86400, 604800, 2592000, 31536000]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.7"), text, units, units)
+		self.bind(self.convertTime)
+		self.grid()
+
+	def convertTime(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
+class pyCalc(Tools):
 	def __init__(self):
 		self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
 		self.settingsTemplate = {
@@ -541,12 +579,13 @@ class pyCalc(String):
 		menuHelp.add_command(label=_("menu4.1"), command=self.info)
 		menuHelp.add_command(label=_("menu4.2"), command=self.checkForUpdates)
 		menuFunctionsItems = {
-			_("menu1.1"): 'screenSize',
-			_("menu1.2"): 'trigonometricFunc',
-			_("menu1.3"): 'numberSystems',
-			_("menu1.4"): 'temperature',
-			_("menu1.5"): 'length',
-			_("menu1.6"): 'currency'
+			_("menu1.1"): "screenSize",
+			_("menu1.2"): "trigonometricFunc",
+			_("menu1.3"): "numberSystems",
+			_("menu1.4"): "temperature",
+			_("menu1.5"): "length",
+			_("menu1.6"): "currency",
+			_("menu1.7"): "time"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -614,6 +653,8 @@ class pyCalc(String):
 			image = ImageViewer(self.root, _("menu2.4"), "images/exponents.png")
 		elif(function == "radicals"):
 			iamge = ImageViewer(self.root, _("menu2.5"), "images/radicals.png")
+		elif(function == "time"):
+			calc = TimeConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):

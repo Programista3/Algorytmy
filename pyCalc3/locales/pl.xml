@@ -12,6 +12,7 @@
     <translation text="circle">Koło</translation>
     <translation text="clear">Wyczyść</translation>
     <translation text="currency">Waluta:</translation>
+	<translation text="days">Dni</translation>
     <translation text="decimeters">Decymetry</translation>
     <translation text="degree">stopnie</translation>
     <translation text="diagonal">Przekątna:</translation>
@@ -25,6 +26,7 @@
     <translation text="formulas">Wzory</translation>
     <translation text="function">Funkcja:</translation>
     <translation text="height">Wysokość:</translation>
+	<translation text="hours">Godziny</translation>
     <translation text="inch">cali</translation>
     <translation text="inches">Cale</translation>
     <translation text="inputSystem">System wejściowy:</translation>
@@ -37,6 +39,7 @@
     <translation text="menu1.4">Temperatura</translation>
     <translation text="menu1.5">Długość</translation>
     <translation text="menu1.6">Waluta</translation>
+	<translation text="menu1.7">Czas</translation>
     <translation text="menu2">Wzory</translation>
     <translation text="menu2.1">Pola i obwody figur</translation>
 	<translation text="menu2.2">Wartość bezwzględna</translation>
@@ -55,8 +58,13 @@
     <translation text="menu4.1">pyCalc - Informacje</translation>
 	<translation text="menu4.2">Sprawdź dostępność aktualizacji</translation>
     <translation text="meters">Metry</translation>
+	<translation text="microseconds">Mikrosekundy</translation>
     <translation text="miles">Mile</translation>
     <translation text="millimeters">Milimetry</translation>
+	<translation text="milliseconds">Milisekundy</translation>
+	<translation text="minutes">Minuty</translation>
+	<translation text="months">Miesiące</translation>
+	<translation text="nanoseconds">Nanosekundy</translation>
     <translation text="nautical miles">Mile morskie</translation>
     <translation text="number">Liczba:</translation>
 	<translation text="no">Nie</translation>
@@ -66,6 +74,7 @@
     <translation text="rectangle">Prostokąt</translation>
     <translation text="result">Wynik:</translation>
     <translation text="rhombus">Romb</translation>
+	<translation text="seconds">Sekundy</translation>
     <translation text="status01">Pobieranie kursu walut...</translation>
     <translation text="status02">Gotowe!</translation>
     <translation text="targetCurrency">Waluta docelowa:</translation>
@@ -76,7 +85,9 @@
     <translation text="unit">Jednostka:</translation>
 	<translation text="update available">Dostępna aktualizacja</translation>
     <translation text="value">Wartość:</translation>
+	<translation text="weeks">Tygodnie</translation>
     <translation text="width">Szerokość:</translation>
     <translation text="yards">Jardy</translation>
+	<translation text="years">Lata</translation>
 	<translation text="yes">Tak</translation>
 </lang>
