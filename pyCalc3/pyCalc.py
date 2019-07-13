@@ -671,11 +671,16 @@ class pyCalc(Tools):
 			self.end = False
 		if(btn == '='):
 			if(self.textbox['text'] != "0"):
-				result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
-				self.addHistoryItem(self.textbox['text']+'='+str(result))
-				self.textbox['text'] = str(result)
-				self.resultPreview['text'] = "0"
-				self.end = True
+				try:
+					result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
+					self.addHistoryItem(self.textbox['text']+'='+str(result))
+					self.textbox['text'] = str(result)
+					self.resultPreview['text'] = "0"
+					self.end = True
+				except ZeroDivisionError:
+					messagebox.showerror(_("error"), _("err1"))
+					self.textbox['text'] = '0'
+					self.resultPreview['text'] = '0'
 		elif(btn == 'C'):
 			self.textbox['text'] = "0"
 			self.resultPreview['text'] = "0"
@@ -683,23 +688,32 @@ class pyCalc(Tools):
 			if(len(self.textbox['text']) > 1):
 				self.textbox['text'] = self.textbox['text'][:-1]
 				if(self.textbox['text'][-1:].isdigit()):
-					result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
-					self.resultPreview['text'] = result
+					try:
+						result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
+						self.resultPreview['text'] = result
+					except ZeroDivisionError:
+						self.resultPreview['text'] = '-'
 			else:
 				self.textbox['text'] = "0"
 				self.resultPreview['text'] = "0"
 		elif(btn == 'ᵪ²'):
 			if(self.textbox['text'][-1:].isdigit()):
 				self.textbox['text'] += '^2'
-				result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
-				self.resultPreview['text'] = result
+				try:
+					result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
+					self.resultPreview['text'] = result
+				except ZeroDivisionError:
+					self.resultPreview['text'] = '-'
 		elif(btn == 'ᵪʸ'):
 			if(self.textbox['text'][-1:].isdigit()):
 				self.textbox['text'] += '^'
 		elif(btn in self.chars):
 			if(btn.isdigit() or btn in ['%','‰']):
-				result = self.calculateRPN(self.convertToRPN(self.textbox['text']+btn))
-				self.resultPreview['text'] = result
+				try:
+					result = self.calculateRPN(self.convertToRPN(self.textbox['text']+btn))
+					self.resultPreview['text'] = result
+				except ZeroDivisionError:
+					self.resultPreview['text'] = '-'
 			if(self.textbox['text'] == "0"):
 				if(btn in ['1','2','3','4','5','6','7','8','9','(','-','√']):
 					self.textbox['text'] = btn
@@ -840,9 +854,7 @@ class pyCalc(Tools):
 							if(a != 0):
 								stack.push(b/a)
 							else:
-								messagebox.showerror(_("error"), _("err1"))
-								self.textbox['text'] = '0'
-								return 0
+								raise ZeroDivisionError
 						elif(c == "^"):
 							stack.push(b**a)
 					else:
