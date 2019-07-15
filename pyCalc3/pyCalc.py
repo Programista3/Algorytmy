@@ -65,10 +65,10 @@ class StandardWindow:
 		self.labels = []
 		for i in range(4):
 			self.labels.append(ttk.Label(self.frame, text=text[i]))
-		self.value = ttk.Entry(self.frame, width=14)
-		self.inCBox = ttk.Combobox(self.frame, values=units1, width=11)
+		self.value = ttk.Entry(self.frame, width=20)
+		self.inCBox = ttk.Combobox(self.frame, values=units1, width=17)
 		self.inCBox.current(0)
-		self.outCBox = ttk.Combobox(self.frame, values=units2, width=11)
+		self.outCBox = ttk.Combobox(self.frame, values=units2, width=17)
 		self.outCBox.current(1)
 		self.result = ttk.Label(self.frame)
 		self.submit = ttk.Button(self.frame, text=_("calculate"))
@@ -90,7 +90,7 @@ class StandardWindow:
 		self.frame.grid(row=0, column=0, rowspan=5, columnspan=2, padx=20, pady=20)
 		for i in range(4):
 			self.labels[i].grid(row=i, column=0, pady=5, padx=8)
-		self.value.grid(row=0, column=1, padx=10)
+		self.value.grid(row=0, column=1, padx=20)
 		self.inCBox.grid(row=1, column=1)
 		self.outCBox.grid(row=2, column=1)
 		self.result.grid(row=3, column=1)
@@ -409,9 +409,27 @@ class TimeConverter(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
+class SpeedConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("mm/s"),_("cm/s"),_("m/s"),_("km/s"),_("mm/min"),_("cm/min"),_("m/min"),_("km/min"),_("mm/h"),_("cm/h"),_("m/h"),_("km/h"),_("ft/s"),_("ft/min"),_("ft/h"),_("yd/s"),_("yd/min"),_("yd/h"),_("mi/s"),_("mi/min"),_("kn"),_("mach")]
+		self.values = [Decimal(str(i)) for i in [0.001, 0.01, 1, 1000, 1.66667E-5, 0.0001666667, 0.0166666667, 16.6666666667, 2.7777777777778E-7, 2.7777777777778E-6, 0.0002777778, 0.2777777778, 0.3048, 0.00508, 8.46667E-5, 0.9144, 0.01524, 0.000254, 1609.344, 26.8224, 0.5144444444, 295.0464000003]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.8"), text, units, units)
+		self.bind(self.convertSpeed)
+		self.grid()
+
+	def convertSpeed(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
 class pyCalc(Tools):
 	def __init__(self):
-		self.chars = ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(',')','√','%','‰']
 		self.settingsTemplate = {
 			'Personalization': {
 				'language': 'pl',
@@ -423,7 +441,7 @@ class pyCalc(Tools):
 				'continuityOfCalculations': 'true'
 			}
 		}
-		self.version = "3.1.13"
+		self.version = "3.1.14"
 		self.languages = ['pl','en']
 		self.lang = "pl"
 		self.end = False
@@ -531,7 +549,8 @@ class pyCalc(Tools):
 			_("menu1.4"): "temperature",
 			_("menu1.5"): "length",
 			_("menu1.6"): "currency",
-			_("menu1.7"): "time"
+			_("menu1.7"): "time",
+			_("menu1.8"): "speed"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -601,6 +620,8 @@ class pyCalc(Tools):
 			iamge = ImageViewer(self.root, _("menu2.5"), "images/radicals.png")
 		elif(function == "time"):
 			calc = TimeConverter(self.root)
+		elif(function == "speed"):
+			calc = SpeedConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):
