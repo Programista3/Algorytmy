@@ -438,15 +438,14 @@ class pyCalc(Tools):
 			'Settings': {
 				'resultPreview': 'true',
 				'history': 'false',
-				'continuityOfCalculations': 'true'
+				'continuityOfCalculations': 'true',
+				'autoUpdate': 'true'
 			}
 		}
 		self.version = "3.1.14"
 		self.languages = ['pl','en']
 		self.lang = "pl"
 		self.end = False
-		check = threading.Thread(target=self.checkForUpdates)
-		check.start()
 		self.checkSettings()
 		self.startGui()
 
@@ -469,12 +468,13 @@ class pyCalc(Tools):
 		vShowPreview = BooleanVar(value=True)
 		vShowHistory = BooleanVar(value=False)
 		self.vContinuity = BooleanVar(value=True)
+		vAutoUpdate = BooleanVar(value=True)
 
 		config = ConfigParser()
 		cfgpath = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc','settings.ini')
 		if(os.path.isfile(cfgpath)):
 			config.read(cfgpath)
-			if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names() and config['Settings']['resultPreview'] in ['true','false','True','False','0','1'] and config['Settings']['history'] in ['true','false','True','False','0','1'] and config['Settings']['continuityOfCalculations'] in ['true','false','True','False','0','1']):
+			if(config['Personalization']['language'] in self.languages and config['Personalization']['theme'] in self.style.theme_names() and config['Settings']['resultPreview'] in ['true','false','True','False','0','1'] and config['Settings']['history'] in ['true','false','True','False','0','1'] and config['Settings']['continuityOfCalculations'] in ['true','false','True','False','0','1'] and config['Settings']['autoUpdate'] in ['true','false','True','False','0','1']):
 				self.lang = config['Personalization']['language']
 				lang.select(config['Personalization']['language'])
 				vLang.set(self.lang)
@@ -492,10 +492,18 @@ class pyCalc(Tools):
 					self.vContinuity.set(True)
 				else:
 					self.vContinuity.set(False)
+				if(config['Settings']['autoUpdate'] in ['true', 'True', '1']):
+					vAutoUpdate.set(True)
+				else:
+					vAutoUpdate.set(False)
 			else:
 				self.createDefaultSettingsFile()
 		else:
 			self.createDefaultSettingsFile()
+
+		if(vAutoUpdate.get()):
+			check = threading.Thread(target=self.checkForUpdates, args=(False,))
+			check.start()
 
 		menu = Menu(self.root)
 		menuFunctions = Menu(self.root, tearoff=0)
@@ -540,8 +548,9 @@ class pyCalc(Tools):
 		menuOptions.add_checkbutton(label=_("menu3.3"), onvalue=True, offvalue=False, variable=vShowPreview, command=lambda: self.changeSettings('resultPreview', vShowPreview.get()))
 		menuOptions.add_checkbutton(label=_("menu3.4"), onvalue=True, offvalue=False, variable=vShowHistory, command=lambda: self.changeSettings('history', vShowHistory.get()))
 		menuOptions.add_checkbutton(label=_("menu3.5"), onvalue=True, offvalue=False, variable=self.vContinuity, command=lambda: self.changeSettings('continuity', self.vContinuity.get()))
+		menuOptions.add_checkbutton(label=_("menu3.6"), onvalue=True, offvalue=False, variable=vAutoUpdate, command=lambda: self.changeSettings('autoUpdate', vAutoUpdate.get()))
 		menuHelp.add_command(label=_("menu4.1"), command=self.info)
-		menuHelp.add_command(label=_("menu4.2"), command=self.checkForUpdates)
+		menuHelp.add_command(label=_("menu4.2"), command=lambda: threading.Thread(target=self.checkForUpdates, args=(True,)).start())
 		menuFunctionsItems = {
 			_("menu1.1"): "screenSize",
 			_("menu1.2"): "trigonometricFunc",
@@ -913,7 +922,7 @@ class pyCalc(Tools):
 			config.write(cfgfile)
 			cfgfile.close()
 
-	def checkForUpdates(self):
+	def checkForUpdates(self, *args):
 		latest = urllib.urlopen('https://github.com/Programista3/pyCalc/releases/latest')
 		parse = BeautifulSoup(latest, 'html.parser')
 		version = parse.select_one('div.release-header > div > div > a').text
@@ -931,5 +940,17 @@ class pyCalc(Tools):
 			btnYes.pack(side=LEFT, padx=(0, 10))
 			btnNo = ttk.Button(buttons, text=_("no"), command=window.destroy)
 			btnNo.pack(side=LEFT)
+		elif(args[0]):
+			window = Toplevel(self.root, padx=20, pady=10)
+			window.resizable(False, False)
+			window.transient(self.root)
+			window.title(_("up to date"))
+			window.iconbitmap('pycalc.ico')
+			label = Label(window, text=_("up to date msg")+'\r\n'+_("actual version")+'  '+self.version, justify=LEFT)
+			label.pack(pady=(0, 10))
+			buttons = ttk.Frame(window)
+			buttons.pack()
+			btnOk = ttk.Button(buttons, text="OK", command=window.destroy)
+			btnOk.pack()
 
 calc = pyCalc()

@@ -65,6 +65,7 @@
     <translation text="menu3.3">Pokaż podgląd wyniku</translation>
     <translation text="menu3.4">Pokaż historię</translation>
 	<translation text="menu3.5">Ciągłość działań</translation>
+	<translation text="menu3.6">Sprawdzaj aktualizacje przy starcie</translation>
     <translation text="menu3.1.1">Polski</translation>
     <translation text="menu3.1.2">Angielski</translation>
     <translation text="menu4">Pomoc</translation>
@@ -105,6 +106,8 @@
     <translation text="triangle">Trójkąt</translation>
     <translation text="unit">Jednostka:</translation>
 	<translation text="update available">Dostępna aktualizacja</translation>
+	<translation text="up to date">Brak aktualizacji</translation>
+	<translation text="up to date msg">Oprogramowanie jest aktualne</translation>
     <translation text="value">Wartość:</translation>
 	<translation text="weeks">Tygodnie</translation>
     <translation text="width">Szerokość:</translation>
