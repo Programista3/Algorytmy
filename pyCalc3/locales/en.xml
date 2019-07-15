@@ -20,6 +20,7 @@
     <translation text="err1">Cannot divide by zero!</translation>
     <translation text="err2">Incorrect value</translation>
     <translation text="err3">File not found!</translation>
+	<translation text="err4">Overflow</translation>
     <translation text="error">Error</translation>
     <translation text="fahrenheit">Fahrenheit</translation>
     <translation text="foots">Foots</translation>

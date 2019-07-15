@@ -20,6 +20,7 @@
     <translation text="err1">Nie można dzielić przez zero</translation>
     <translation text="err2">Nieprawidłowa wartość</translation>
     <translation text="err3">Nie odnaleziono pliku!</translation>
+	<translation text="err4">Przepełnienie</translation>
     <translation text="error">Błąd</translation>
     <translation text="fahrenheit">Fahrenheit</translation>
     <translation text="foots">Stopy</translation>

@@ -665,85 +665,78 @@ class pyCalc(Tools):
 				lines -= math.ceil(len(items[len(items)-1])/30)
 				items.pop()
 
+	def calculate(self, operation, preview=True):
+		try:
+			result = self.calculateRPN(self.convertToRPN(operation))
+			if(preview):
+				self.resultPreview['text'] = result
+			else:
+				self.resultPreview['text'] = '0'
+				self.addHistoryItem(operation+'='+str(result))
+				self.textbox['text'] = str(result)
+				self.end = True
+		except ZeroDivisionError:
+			if(preview):
+				self.resultPreview['text'] = '-'
+			else:
+				messagebox.showerror(_("error"), _("err1"))
+				self.resultPreview['text'] = '0'
+				self.textbox['text'] = '0'
+		except Overflow:
+			messagebox.showerror(_("error"), _("err4"))
+			self.resultPreview['text'] = '0'
+			self.textbox['text'] = '0'
+
 	def click(self, btn):
 		if(self.vContinuity.get() == False and self.end):
-			self.textbox['text'] = "0"
+			self.textbox['text'] = '0'
 			self.end = False
-		if(btn == '='):
-			if(self.textbox['text'] != "0"):
-				try:
-					result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
-					self.addHistoryItem(self.textbox['text']+'='+str(result))
-					self.textbox['text'] = str(result)
-					self.resultPreview['text'] = "0"
-					self.end = True
-				except ZeroDivisionError:
-					messagebox.showerror(_("error"), _("err1"))
-					self.textbox['text'] = '0'
-					self.resultPreview['text'] = '0'
+		if(btn == '=' and self.textbox['text'] != '0'):
+			self.calculate(self.textbox['text'], False)
 		elif(btn == 'C'):
-			self.textbox['text'] = "0"
-			self.resultPreview['text'] = "0"
+			self.textbox['text'] = '0'
+			self.resultPreview['text'] = '0'
 		elif(btn == 'AC'):
 			if(len(self.textbox['text']) > 1):
 				self.textbox['text'] = self.textbox['text'][:-1]
 				if(self.textbox['text'][-1:].isdigit()):
-					try:
-						result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
-						self.resultPreview['text'] = result
-					except ZeroDivisionError:
-						self.resultPreview['text'] = '-'
+					self.calculate(self.textbox['text'])
 			else:
-				self.textbox['text'] = "0"
-				self.resultPreview['text'] = "0"
-		elif(btn == 'ᵪ²'):
-			if(self.textbox['text'][-1:].isdigit()):
-				self.textbox['text'] += '^2'
-				try:
-					result = self.calculateRPN(self.convertToRPN(self.textbox['text']))
-					self.resultPreview['text'] = result
-				except ZeroDivisionError:
-					self.resultPreview['text'] = '-'
-		elif(btn == 'ᵪʸ'):
-			if(self.textbox['text'][-1:].isdigit()):
-				self.textbox['text'] += '^'
-		elif(btn in self.chars):
-			if(btn.isdigit() or btn in ['%','‰']):
-				try:
-					result = self.calculateRPN(self.convertToRPN(self.textbox['text']+btn))
-					self.resultPreview['text'] = result
-				except ZeroDivisionError:
-					self.resultPreview['text'] = '-'
-			if(self.textbox['text'] == "0"):
-				if(btn in ['1','2','3','4','5','6','7','8','9','(','-','√']):
-					self.textbox['text'] = btn
-				elif(btn in [',','.','+','-','*','/','^']):
-					self.textbox['text'] += btn
-			elif(self.textbox['text'][-1:] == '0' and self.textbox['text'][-2:][0] in ['+','-','*','/','^']):
-				self.textbox['text'] = self.textbox['text']+btn
-			elif(self.textbox['text'][-1:].isdigit()):
-				if(btn in [',','.','+','-','*','/','^','%','‰'] or btn.isdigit()):
-					self.textbox['text'] += btn
-				elif(btn == '('):
-					self.textbox['text'] += '*('
-				elif(btn == ')'):
-					if(self.textbox['text'].count('(') > self.textbox['text'].count(')')):
-						self.textbox['text'] += ')'
-			elif(self.textbox['text'][-1:] == ')'):
-				if(btn in ['+','-','*','/','^']):
-					self.textbox['text'] += btn
-				elif(btn == ')'):
-					if(self.textbox['text'].count('(') > self.textbox['text'].count(')')):
-						self.textbox['text'] += ')'
-			elif(self.textbox['text'][-1:] in ['+','-','*','/','^']):
-				if(btn.isdigit() or btn in ['√','(','-']):
-					self.textbox['text'] += btn
-			elif(self.textbox['text'][-1:] in [',','.','√']):
-				if(btn.isdigit()):
-					self.textbox['text'] += btn
-			elif(self.textbox['text'][-1:] == '('):
-				if(btn.isdigit() or btn == '√'):
-					self.textbox['text'] += btn
+				self.textbox['text'] = '0'
+				self.resultPreview['text'] = '0'
+		elif(btn == 'ᵪ²' and self.textbox['text'][-1:] in ['1','2','3','4','5','6','7','8','9','0',')','%','‰']):
+			self.textbox['text'] += '^2'
+			self.calculate(self.textbox['text'])
+		elif(btn == 'ᵪʸ' and self.textbox['text'][-1:] in ['1','2','3','4','5','6','7','8','9','0',')','%','‰']):
+			self.textbox['text'] += '^'
+		elif(self.textbox['text'] == '0'):
+			if(btn in ['1','2','3','4','5','6','7','8','9','0','-','(','√']):
+				self.textbox['text'] = btn
+			elif(btn in [',', '.']):
+				self.textbox['text'] += '.'
+		elif(btn.isdigit()):
+			if(self.textbox['text'][-1:] in ['1','2','3','4','5','6','7','8','9','0','-','+','*','/','^',',','.','(','√']):
+				self.textbox['text'] += btn
+				self.calculate(self.textbox['text'])
+		elif(btn in ['+', '*', '/', '^',] and self.textbox['text'][-1:] in ['1','2','3','4','5','6','7','8','9','0',')','%','‰']):
+			self.textbox['text'] += btn
+		elif(btn == '-' and self.textbox['text'][-1:] in ['1','2','3','4','5','6','7','8','9','0','(',')','%','‰']):
+			self.textbox['text'] += btn
+		elif(btn in ['%', '‰'] and self.textbox['text'][-1:].isdigit()):
+			self.textbox['text'] += btn
+			self.calculate(self.textbox['text'])
+		elif(btn in [',','.'] and self.textbox['text'][-1:].isdigit()):
+			if(not re.match(r'\d+[,.]\d+$', self.textbox['text'])):
+				self.textbox['text'] += btn
+		elif(btn == '√' and self.textbox['text'][-1:] in ['-','+','*','/','(']):
+			self.textbox['text'] += btn
+		elif(btn == '(' and self.textbox['text'][-1:] in ['-','+','*','/','^','√','(']):
+			self.textbox['text'] += btn
+		elif(btn == '(' and self.textbox['text'][-1:].isdigit()):
+			self.textbox['text'] += '*('
+		elif(btn == ')' and self.textbox['text'][-1:] in ['1','2','3','4','5','6','7','8','9','0',')','%','‰']):
+			if(self.textbox['text'].count('(') > self.textbox['text'].count(')')):
+				self.textbox['text'] += btn
 
 	def isOperator(self, char):
 		return char in ['+','-','*','/','^','√']
@@ -751,15 +744,17 @@ class pyCalc(Tools):
 	def isFunction(self, char):
 		return char in ['%','‰']
 
-	def priority(self, operator):
-		if(operator == '+' or operator == '-'):
+	def priority(self, char):
+		if(char == '+' or char == '-'):
 			return 1
-		elif(operator == '*' or operator == '/'):
+		elif(char == '*' or char == '/'):
 			return 2
-		elif(operator == '^' or operator == '√'):
+		elif(char == '^' or char == '√'):
 			return 3
-		elif(operator == '('):
+		elif(char == '('):
 			return 0
+		else:
+			return 4
 
 	def convertToRPN(self, text):
 		text = text.replace(',', '.')
@@ -822,22 +817,20 @@ class pyCalc(Tools):
 		stack = Stack()
 		output = []
 		for c in rpn:
-			if(self.isNumber(c) == 1):
-				stack.push(int(c))
-			elif(self.isNumber(c) == 2):
-				stack.push(float(c))
+			if(self.isNumber(c) == 1 or self.isNumber(c) == 2):
+				stack.push(Decimal(c))
 			elif(self.isFunction(c)):
 				a = stack.top()
 				stack.pop()
 				if(c == '%'):
 					stack.push(a/100)
 				elif(c == '‰'):
-					stack.push(1/1000)
+					stack.push(a/1000)
 			elif(self.isOperator(c)):
 				if(c == '√'):
 					a = stack.top()
 					stack.pop()
-					stack.push(a**0.5)
+					stack.push(a**Decimal('0.5'))
 				else:
 					if(stack.size() > 1):
 						a = stack.top()
@@ -860,6 +853,7 @@ class pyCalc(Tools):
 					else:
 						return 0
 		return int(stack.top()) if float(stack.top()).is_integer() else stack.top()
+		#return self.normalizeFraction(stack.top())
 
 	def checkSettings(self):
 		path = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc')
