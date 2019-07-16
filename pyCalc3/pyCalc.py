@@ -442,7 +442,7 @@ class pyCalc(Tools):
 				'autoUpdate': 'true'
 			}
 		}
-		self.version = "3.1.14"
+		self.version = "3.1.15"
 		self.languages = ['pl','en']
 		self.lang = "pl"
 		self.end = False
@@ -524,7 +524,11 @@ class pyCalc(Tools):
 			_("menu2.2"): "absolute-value",
 			_("menu2.3"): "short-multiplication",
 			_("menu2.4"): "exponents",
-			_("menu2.5"): "radicals"
+			_("menu2.5"): "radicals",
+			_("menu2.6"): "logarithms",
+			_("menu2.7"): "arithmetic_sequences",
+			_("menu2.8"): "geometric_sequences",
+			_("menu2.9"): "quadratic_function"
 		}
 		for item in sorted(menuFormulasItems.keys()):
 			if(type(menuFormulasItems[item]) is str):
@@ -626,11 +630,19 @@ class pyCalc(Tools):
 		elif(function == "exponents"):
 			image = ImageViewer(self.root, _("menu2.4"), "images/exponents.png")
 		elif(function == "radicals"):
-			iamge = ImageViewer(self.root, _("menu2.5"), "images/radicals.png")
+			image = ImageViewer(self.root, _("menu2.5"), "images/radicals.png")
 		elif(function == "time"):
 			calc = TimeConverter(self.root)
 		elif(function == "speed"):
 			calc = SpeedConverter(self.root)
+		elif(function == "logarithms"):
+			image = ImageViewer(self.root, _("menu2.6"), "images/logarithms.png")
+		elif(function == "arithmetic_sequences"):
+			image = ImageViewer(self.root, _("menu2.7"), "images/arithmetic_sequences.png")
+		elif(function == "geometric_sequences"):
+			image = ImageViewer(self.root, _("menu2.8"), "images/geometric_sequences.png")
+		elif(function == "quadratic_function"):
+			image = ImageViewer(self.root, _("menu2.9"), "images/quadratic_function.png")
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):
