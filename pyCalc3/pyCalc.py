@@ -65,10 +65,10 @@ class StandardWindow:
 		self.labels = []
 		for i in range(4):
 			self.labels.append(ttk.Label(self.frame, text=text[i]))
-		self.value = ttk.Entry(self.frame, width=20)
-		self.inCBox = ttk.Combobox(self.frame, values=units1, width=17)
+		self.value = ttk.Entry(self.frame, width=22)
+		self.inCBox = ttk.Combobox(self.frame, values=units1, width=19)
 		self.inCBox.current(0)
-		self.outCBox = ttk.Combobox(self.frame, values=units2, width=17)
+		self.outCBox = ttk.Combobox(self.frame, values=units2, width=19)
 		self.outCBox.current(1)
 		self.result = ttk.Label(self.frame)
 		self.submit = ttk.Button(self.frame, text=_("calculate"))
@@ -428,6 +428,44 @@ class SpeedConverter(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
+class AreaConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("mm^2"),_("cm^2"),_("in^2"),_("dm^2"),_("ft^2"),_("yd^2"),_("m^2"),_("km^2"),_("a"),_("ac"),_("ha"),_("mile^2")]
+		self.values = [Decimal(str(i)) for i in [0.000001, 0.0001, 0.00064516, 0.01, 0.09290304, 0.83612736, 1, 1000000, 100, 4046.8564224, 10000, 2589988.110336]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.9"), text, units, units)
+		self.bind(self.convertArea)
+		self.grid()
+
+	def convertArea(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
+class EnergyConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("GJ"),_("MJ"),_("kJ"),_("j"),_("cal"),_("kcal"),_("kWh"),_("Btu"),_("kGm"),_("eV"),_("MT")]
+		self.values = [Decimal(str(i)) for i in [1e+9, 1e+6, 1000, 1, 4.1868, 4187, 3.6e+6, 1055.06, 9.80665, 1.60218e-19, 4e+15]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.10"), text, units, units)
+		self.bind(self.convertEnergy)
+		self.grid()
+
+	def convertEnergy(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
 class pyCalc(Tools):
 	def __init__(self):
 		self.settingsTemplate = {
@@ -563,7 +601,9 @@ class pyCalc(Tools):
 			_("menu1.5"): "length",
 			_("menu1.6"): "currency",
 			_("menu1.7"): "time",
-			_("menu1.8"): "speed"
+			_("menu1.8"): "speed",
+			_("menu1.9"): "area",
+			_("menu1.10"): "energy"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -643,6 +683,10 @@ class pyCalc(Tools):
 			image = ImageViewer(self.root, _("menu2.8"), "images/geometric_sequences.png")
 		elif(function == "quadratic_function"):
 			image = ImageViewer(self.root, _("menu2.9"), "images/quadratic_function.png")
+		elif(function == "area"):
+			calc = AreaConverter(self.root)
+		elif(function == "energy"):
+			calc = EnergyConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):
