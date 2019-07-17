@@ -14,6 +14,8 @@ pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Pol
 - Currency converter
 - Time Converter
 - Speed Converter
+- Energy Converter
+- Area Converter
 - Math formulas
 ## Source
 ### Requirements
