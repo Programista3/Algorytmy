@@ -485,6 +485,25 @@ class WeightAndMassConverter(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
+class DataConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("b"),_("B"),_("Kb"),_("KB"),_("Mb"),_("MB"),_("Gb"),_("GB"),_("Tb"),_("TB"),_("Pb"),_("PB"),_("Eb"),_("EB")]
+		self.values = [Decimal(str(i)) for i in [0.125, 1, 125, 1000, 125000, 1000000, 125000000, 1000000000, 125000000000, 1000000000000, 125000000000000]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.12"), text, units, units)
+		self.bind(self.convertData)
+		self.grid()
+
+	def convertData(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
 class pyCalc(Tools):
 	def __init__(self):
 		self.settingsTemplate = {
@@ -623,7 +642,8 @@ class pyCalc(Tools):
 			_("menu1.8"): "speed",
 			_("menu1.9"): "area",
 			_("menu1.10"): "energy",
-			_("menu1.11"): "weightAndMass"
+			_("menu1.11"): "weightAndMass",
+			_("menu1.12"): "data"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -709,6 +729,8 @@ class pyCalc(Tools):
 			calc = EnergyConverter(self.root)
 		elif(function == "weightAndMass"):
 			calc = WeightAndMassConverter(self.root)
+		elif(function == "data"):
+			calc = DataConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):

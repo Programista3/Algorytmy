@@ -8,6 +8,8 @@
 	<translation text="ac">acre</translation>
 	<translation text="actual version">Actual version:</translation>
 	<translation text="available version">Available version:</translation>
+	<translation text="b">bits</translation>
+	<translation text="B">bytes</translation>
 	<translation text="Btu">Btu</translation>
 	<translation text="cal">calorie</translation>
     <translation text="calculate">Calculate</translation>
@@ -31,6 +33,8 @@
     <translation text="diagonal">Diagonal:</translation>
 	<translation text="dm^2">square decimeter</translation>
 	<translation text="download update">Do you want to download new version?</translation>
+	<translation text="Eb">exabits</translation>
+	<translation text="EB">exabytes</translation>
     <translation text="err1">Cannot divide by zero!</translation>
     <translation text="err2">Incorrect value</translation>
     <translation text="err3">File not found!</translation>
@@ -46,6 +50,8 @@
 	<translation text="ft^2">square foot</translation>
     <translation text="function">Function:</translation>
 	<translation text="g">gram</translation>
+	<translation text="Gb">gigabits</translation>
+	<translation text="GB">gigabytes</translation>
 	<translation text="GJ">gigajoule</translation>
 	<translation text="gr">grain</translation>
 	<translation text="ha">hectare</translation>
@@ -56,6 +62,8 @@
     <translation text="inches">Inches</translation>
     <translation text="inputSystem">Input system:</translation>
 	<translation text="j">joule</translation>
+	<translation text="Kb">kilobits</translation>
+	<translation text="KB">kilobytes</translation>
 	<translation text="kcal">kilocalorie</translation>
     <translation text="kelvin">Kelvin</translation>
 	<translation text="kg">kilogram</translation>
@@ -70,6 +78,8 @@
 	<translation text="kWh">kilowatt-hour</translation>
 	<translation text="lb">pound</translation>
 	<translation text="mach">Mach</translation>
+	<translation text="Mb">megabits</translation>
+	<translation text="MB">megabytes</translation>
     <translation text="menu1">Functions</translation>
     <translation text="menu1.1">Screen Size</translation>
     <translation text="menu1.2">Trigonometric Functions</translation>
@@ -82,6 +92,7 @@
 	<translation text="menu1.9">Area</translation>
 	<translation text="menu1.10">Energy</translation>
 	<translation text="menu1.11">Weight and mass</translation>
+	<translation text="menu1.12">Data</translation>
     <translation text="menu2">Formulas</translation>
     <translation text="menu2.1">Area and perimeter of shapes</translation>
 	<translation text="menu2.2">Absolute value</translation>
@@ -131,6 +142,8 @@
 	<translation text="no">No</translation>
 	<translation text="oz">ounce</translation>
     <translation text="parallelogram">Parallelogram</translation>
+	<translation text="Pb">petabits</translation>
+	<translation text="PB">petabytes</translation>
     <translation text="radian">radians</translation>
     <translation text="ratio">Aspect Ratio:</translation>
     <translation text="rectangle">Rectangle</translation>
@@ -143,6 +156,8 @@
     <translation text="targetCurrency">Target Currency:</translation>
     <translation text="targetSystem">Target system:</translation>
     <translation text="targetUnit">Target unit:</translation>
+	<translation text="Tb">terabits</translation>
+	<translation text="TB">terabytes</translation>
     <translation text="trapezoid">Trapezoid</translation>
     <translation text="triangle">Triangle</translation>
 	<translation text="tonUK">ton UK</translation>
