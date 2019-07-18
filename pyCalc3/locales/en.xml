@@ -13,13 +13,18 @@
     <translation text="calculate">Calculate</translation>
     <translation text="celsius">Celsius</translation>
     <translation text="centimeters">Centimeters</translation>
+	<translation text="cg">centigram</translation>
     <translation text="circle">Circle</translation>
     <translation text="clear">Clear</translation>
 	<translation text="cm/s">centimeter/second [cm/s]</translation>
 	<translation text="cm/min">centimeter/minute [cm/min]</translation>
 	<translation text="cm/h">centimeter/hour [cm/h]</translation>
 	<translation text="cm^2">square centimeter</translation>
+	<translation text="ct">carat</translation>
     <translation text="currency">Currency:</translation>
+	<translation text="cwt">hundredweight US</translation>
+	<translation text="cwtUK">hundredweight UK</translation>
+	<translation text="dag">dekagram</translation>
 	<translation text="days">Days</translation>
     <translation text="decimeters">Decimeters</translation>
     <translation text="degree">degrees</translation>
@@ -40,7 +45,9 @@
 	<translation text="ft/h">foot/hour [ft/h]</translation>
 	<translation text="ft^2">square foot</translation>
     <translation text="function">Function:</translation>
+	<translation text="g">gram</translation>
 	<translation text="GJ">gigajoule</translation>
+	<translation text="gr">grain</translation>
 	<translation text="ha">hectare</translation>
     <translation text="height">Height:</translation>
 	<translation text="hours">Hours</translation>
@@ -51,6 +58,7 @@
 	<translation text="j">joule</translation>
 	<translation text="kcal">kilocalorie</translation>
     <translation text="kelvin">Kelvin</translation>
+	<translation text="kg">kilogram</translation>
 	<translation text="kGm">kilogram-force meter</translation>
     <translation text="kilometers">Kilometers</translation>
 	<translation text="kJ">kilojoule</translation>
@@ -60,6 +68,7 @@
 	<translation text="km/h">kilometer/hour [km/h]</translation>
 	<translation text="km^2">square kilometer</translation>
 	<translation text="kWh">kilowatt-hour</translation>
+	<translation text="lb">pound</translation>
 	<translation text="mach">Mach</translation>
     <translation text="menu1">Functions</translation>
     <translation text="menu1.1">Screen Size</translation>
@@ -72,6 +81,7 @@
 	<translation text="menu1.8">Speed</translation>
 	<translation text="menu1.9">Area</translation>
 	<translation text="menu1.10">Energy</translation>
+	<translation text="menu1.11">Weight and mass</translation>
     <translation text="menu2">Formulas</translation>
     <translation text="menu2.1">Area and perimeter of shapes</translation>
 	<translation text="menu2.2">Absolute value</translation>
@@ -95,6 +105,7 @@
     <translation text="menu4.1">pyCalc - Informations</translation>
 	<translation text="menu4.2">Check for updates</translation>
     <translation text="meters">Meters</translation>
+	<translation text="mg">milligram</translation>
 	<translation text="microseconds">Microseconds</translation>
 	<translation text="mi/s">mile/second [mi/s]</translation>
 	<translation text="mi/min">mile/minute [mi/min]</translation>
@@ -118,6 +129,7 @@
     <translation text="nautical miles">Nautical miles</translation>
     <translation text="number">Number:</translation>
 	<translation text="no">No</translation>
+	<translation text="oz">ounce</translation>
     <translation text="parallelogram">Parallelogram</translation>
     <translation text="radian">radians</translation>
     <translation text="ratio">Aspect Ratio:</translation>
@@ -127,11 +139,14 @@
 	<translation text="seconds">Seconds</translation>
     <translation text="status01">Downloading exchange rate...</translation>
     <translation text="status02">Ready!</translation>
+	<translation text="stone">stone</translation>
     <translation text="targetCurrency">Target Currency:</translation>
     <translation text="targetSystem">Target system:</translation>
     <translation text="targetUnit">Target unit:</translation>
     <translation text="trapezoid">Trapezoid</translation>
     <translation text="triangle">Triangle</translation>
+	<translation text="tonUK">ton UK</translation>
+	<translation text="tonUS">ton US</translation>
     <translation text="unit">Unit:</translation>
 	<translation text="update available">Update is available</translation>
 	<translation text="up to date">Up to date</translation>

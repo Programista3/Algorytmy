@@ -466,6 +466,25 @@ class EnergyConverter(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
+class WeightAndMassConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("ct"),_("cg"),_("dag"),_("gr"),_("g"),_("cwt"),_("cwtUK"),_("kg"),_("mg"),_("oz"),_("lb"),_("stone"),_("tonUS"),_("tonUK")]
+		self.values = [Decimal(str(i)) for i in [0.0002, 0.00001, 0.01, 0.00006479891, 0.001, 45.359237, 50.80234544, 1, 0.000001, 0.028349523125, 0.45359237, 6.35029318, 907.18474, 1016.0469088]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.11"), text, units, units)
+		self.bind(self.convertWeightAndMass)
+		self.grid()
+
+	def convertWeightAndMass(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
 class pyCalc(Tools):
 	def __init__(self):
 		self.settingsTemplate = {
@@ -603,7 +622,8 @@ class pyCalc(Tools):
 			_("menu1.7"): "time",
 			_("menu1.8"): "speed",
 			_("menu1.9"): "area",
-			_("menu1.10"): "energy"
+			_("menu1.10"): "energy",
+			_("menu1.11"): "weightAndMass"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -687,6 +707,8 @@ class pyCalc(Tools):
 			calc = AreaConverter(self.root)
 		elif(function == "energy"):
 			calc = EnergyConverter(self.root)
+		elif(function == "weightAndMass"):
+			calc = WeightAndMassConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):

@@ -13,13 +13,18 @@
     <translation text="calculate">Oblicz</translation>
     <translation text="celsius">Celcjusz</translation>
     <translation text="centimeters">Centymetry</translation>
+	<translation text="cg">centygram</translation>
     <translation text="circle">Koło</translation>
     <translation text="clear">Wyczyść</translation>
 	<translation text="cm/s">centymetr/sekunda [cm/s]</translation>
 	<translation text="cm/min">centymetr/minuta [cm/min]</translation>
 	<translation text="cm/h">centymetr/godzina [cm/h]</translation>
 	<translation text="cm^2">centymetr kwadratowy</translation>
+	<translation text="ct">karat</translation>
     <translation text="currency">Waluta:</translation>
+	<translation text="cwt">cetnar USA</translation>
+	<translation text="cwtUK">cetnar ang</translation>
+	<translation text="dag">dekagram</translation>
 	<translation text="days">Dni</translation>
     <translation text="decimeters">Decymetry</translation>
     <translation text="degree">stopnie</translation>
@@ -40,7 +45,9 @@
 	<translation text="ft/h">stopa/godzina [ft/h]</translation>
 	<translation text="ft^2">stopa kwadratowa</translation>
     <translation text="function">Funkcja:</translation>
+	<translation text="g">gram</translation>
 	<translation text="GJ">gigadżul</translation>
+	<translation text="gr">gran</translation>
 	<translation text="ha">hektar</translation>
     <translation text="height">Wysokość:</translation>
 	<translation text="hours">Godziny</translation>
@@ -51,6 +58,7 @@
 	<translation text="j">dżul</translation>
 	<translation text="kcal">kilokaloria</translation>
     <translation text="kelvin">Kelwiny</translation>
+	<translation text="kg">kilogram</translation>
 	<translation text="kGm">kilogramometr</translation>
     <translation text="kilometers">Kilometry</translation>
 	<translation text="kJ">kilodżul</translation>
@@ -60,6 +68,7 @@
 	<translation text="km/h">kilometr/godzina [km/h]</translation>
 	<translation text="km^2">kilometr kwadratowy</translation>
 	<translation text="kWh">kilowatogodzina</translation>
+	<translation text="lb">funt</translation>
 	<translation text="mach">Mach</translation>
     <translation text="menu1">Funkcje</translation>
     <translation text="menu1.1">Wymiary ekranu</translation>
@@ -72,6 +81,7 @@
 	<translation text="menu1.8">Prędkość</translation>
 	<translation text="menu1.9">Powierzchnia</translation>
 	<translation text="menu1.10">Energia</translation>
+	<translation text="menu1.11">Ciężar i masa</translation>
     <translation text="menu2">Wzory</translation>
     <translation text="menu2.1">Pola i obwody figur</translation>
 	<translation text="menu2.2">Wartość bezwzględna</translation>
@@ -95,6 +105,7 @@
     <translation text="menu4.1">pyCalc - Informacje</translation>
 	<translation text="menu4.2">Sprawdź dostępność aktualizacji</translation>
     <translation text="meters">Metry</translation>
+	<translation text="mg">miligram</translation>
 	<translation text="microseconds">Mikrosekundy</translation>
 	<translation text="mi/s">mila/sekunda [mi/s]</translation>
 	<translation text="mi/min">mila/minuta [mi/min]</translation>
@@ -118,6 +129,7 @@
     <translation text="nautical miles">Mile morskie</translation>
     <translation text="number">Liczba:</translation>
 	<translation text="no">Nie</translation>
+	<translation text="oz">uncja</translation>
     <translation text="parallelogram">Równoległobok</translation>
     <translation text="radian">radiany</translation>
     <translation text="ratio">Proporcje:</translation>
@@ -127,11 +139,14 @@
 	<translation text="seconds">Sekundy</translation>
     <translation text="status01">Pobieranie kursu walut...</translation>
     <translation text="status02">Gotowe!</translation>
+	<translation text="stone">kamień</translation>
     <translation text="targetCurrency">Waluta docelowa:</translation>
     <translation text="targetSystem">System docelowy:</translation>
     <translation text="targetUnit">Jednostka docelowa:</translation>
     <translation text="trapezoid">Trapez</translation>
     <translation text="triangle">Trójkąt</translation>
+	<translation text="tonUK">tona długa</translation>
+	<translation text="tonUS">tona krótka</translation>
     <translation text="unit">Jednostka:</translation>
 	<translation text="update available">Dostępna aktualizacja</translation>
 	<translation text="up to date">Brak aktualizacji</translation>
