@@ -8,9 +8,11 @@
 	<translation text="a">are</translation>
 	<translation text="ac">acre</translation>
 	<translation text="actual version">Actual version:</translation>
+	<translation text="atm">atmosphere</translation>
 	<translation text="available version">Available version:</translation>
 	<translation text="b">bits</translation>
 	<translation text="B">bytes</translation>
+	<translation text="bar">bar</translation>
 	<translation text="bbl oil">barrel (oil)</translation>
 	<translation text="bblUS">barrel (US)</translation>
 	<translation text="bblUK">barrel (UK)</translation>
@@ -84,6 +86,7 @@
 	<translation text="gr">grain</translation>
 	<translation text="GW">gigawatt</translation>
 	<translation text="ha">hectare</translation>
+	<translation text="hPa">hectopascal</translation>
     <translation text="height">Height:</translation>
 	<translation text="hL">hectoliter</translation>
 	<translation text="hours">Hours</translation>
@@ -105,6 +108,8 @@
 	<translation text="kcal/h">kilocalorie/hour</translation>
     <translation text="kelvin">Kelvin</translation>
 	<translation text="kg">kilogram</translation>
+	<translation text="kgf/cm^2">kilogram per sq. cm</translation>
+	<translation text="kgf/m^2">kilogram per sq. m</translation>
 	<translation text="kGm">kilogram-force meter</translation>
     <translation text="kilometers">Kilometers</translation>
 	<translation text="kJ">kilojoule</translation>
@@ -114,6 +119,7 @@
 	<translation text="km/h">kilometer/hour [km/h]</translation>
 	<translation text="km^2">square kilometer</translation>
 	<translation text="km^3">cubic kilometer</translation>
+	<translation text="kPa">kilopascal</translation>
 	<translation text="kW">kilowatt</translation>
 	<translation text="kWh">kilowatt-hour</translation>
 	<translation text="L">liter</translation>
@@ -139,6 +145,7 @@
 	<translation text="menu1.12">Data</translation>
 	<translation text="menu1.13">Volume</translation>
 	<translation text="menu1.14">Power</translation>
+	<translation text="menu1.15">Pressure</translation>
     <translation text="menu2">Formulas</translation>
     <translation text="menu2.1">Area and perimeter of shapes</translation>
 	<translation text="menu2.2">Absolute value</translation>
@@ -186,6 +193,7 @@
 	<translation text="m/h">meter/hour [m/h]</translation>
 	<translation text="m^2">square meter</translation>
 	<translation text="mm^2">square millimeter</translation>
+	<translation text="mmHg">millimeter of mercury</translation>
 	<translation text="months">Months</translation>
 	<translation text="MT">megaton</translation>
 	<translation text="mW">milliwatt</translation>
@@ -195,9 +203,12 @@
     <translation text="number">Number:</translation>
 	<translation text="no">No</translation>
 	<translation text="oz">ounce</translation>
-    <translation text="parallelogram">Parallelogram</translation>
+    <translation text="Pa">pascal</translation>
+	<translation text="parallelogram">Parallelogram</translation>
 	<translation text="Pb">petabits</translation>
 	<translation text="PB">petabytes</translation>
+	<translation text="psf">pounds per square foot</translation>
+	<translation text="psi">pounds per square inch</translation>
 	<translation text="ptUS">pint (US)</translation>
 	<translation text="ptUK">pint (UK)</translation>
 	<translation text="qtUS">quart (US)</translation>

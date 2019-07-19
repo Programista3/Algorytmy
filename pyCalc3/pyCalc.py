@@ -542,6 +542,25 @@ class PowerConverter(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
+class PressureConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("atm"),_("bar"),_("Pa"),_("kPa"),_("hPa"),_("mmHg"),_("psf"),_("psi"),_("kgf/cm^2"),_("kgf/m^2")]
+		self.values = [Decimal(str(i)) for i in [101325, 100000, 1, 1000, 100, 133.3223684211, 47.88020833333, 6894.75, 98066.5, 9.80665]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.15"), text, units, units)
+		self.bind(self.convertPressure)
+		self.grid()
+
+	def convertPressure(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
 class pyCalc(Tools):
 	def __init__(self):
 		self.settingsTemplate = {
@@ -683,7 +702,8 @@ class pyCalc(Tools):
 			_("menu1.11"): "weightAndMass",
 			_("menu1.12"): "data",
 			_("menu1.13"): "volume",
-			_("menu1.14"): "power"
+			_("menu1.14"): "power",
+			_("menu1.15"): "pressure"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -775,6 +795,8 @@ class pyCalc(Tools):
 			calc = VolumeConverter(self.root)
 		elif(function == "power"):
 			calc = PowerConverter(self.root)
+		elif(function == "pressure"):
+			calc = PressureConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):

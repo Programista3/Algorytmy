@@ -8,9 +8,11 @@
 	<translation text="a">ar</translation>
 	<translation text="ac">akr</translation>
 	<translation text="actual version">Aktualna wersja:</translation>
+	<translation text="atm">atmosfery</translation>
 	<translation text="available version">Dostępna wersja:</translation>
 	<translation text="b">bity</translation>
 	<translation text="B">bajty</translation>
+	<translation text="bar">bary</translation>
 	<translation text="bbl oil">baryłka (ropa)</translation>
 	<translation text="bblUS">baryłka (USA)</translation>
 	<translation text="bblUK">baryłka (UK)</translation>
@@ -84,6 +86,7 @@
 	<translation text="gr">gran</translation>
 	<translation text="GW">gigawat</translation>
 	<translation text="ha">hektar</translation>
+	<translation text="hPa">hektopaskale</translation>
     <translation text="height">Wysokość:</translation>
 	<translation text="hL">hectoliter</translation>
 	<translation text="hours">Godziny</translation>
@@ -105,6 +108,8 @@
 	<translation text="kcal/h">kilokalorie/godzina</translation>
     <translation text="kelvin">Kelwiny</translation>
 	<translation text="kg">kilogram</translation>
+	<translation text="kgf/cm^2">kilogram na cm^2</translation>
+	<translation text="kgf/m^2">kilogram na m^2</translation>
 	<translation text="kGm">kilogramometr</translation>
     <translation text="kilometers">Kilometry</translation>
 	<translation text="kJ">kilodżul</translation>
@@ -114,6 +119,7 @@
 	<translation text="km/h">kilometr/godzina [km/h]</translation>
 	<translation text="km^2">kilometr kwadratowy</translation>
 	<translation text="km^3">kilometr sześcienny</translation>
+	<translation text="kPa">kilopaskale</translation>
 	<translation text="kW">kilowat</translation>
 	<translation text="kWh">kilowatogodzina</translation>
 	<translation text="L">litr</translation>
@@ -139,6 +145,7 @@
 	<translation text="menu1.12">Dane</translation>
 	<translation text="menu1.13">Objętość</translation>
 	<translation text="menu1.14">Moc</translation>
+	<translation text="menu1.15">Ciśnienie</translation>
     <translation text="menu2">Wzory</translation>
     <translation text="menu2.1">Pola i obwody figur</translation>
 	<translation text="menu2.2">Wartość bezwzględna</translation>
@@ -186,6 +193,7 @@
 	<translation text="m/h">metr/godzina [m/h]</translation>
 	<translation text="m^2">metr kwadratowy</translation>
 	<translation text="mm^2">milimetr kwadratowy</translation>
+	<translation text="mmHg">milimetr słupa rtęci</translation>
 	<translation text="months">Miesiące</translation>
 	<translation text="MT">megatona</translation>
 	<translation text="mW">miliwat</translation>
@@ -195,9 +203,12 @@
     <translation text="number">Liczba:</translation>
 	<translation text="no">Nie</translation>
 	<translation text="oz">uncja</translation>
+	<translation text="Pa">paskale</translation>
     <translation text="parallelogram">Równoległobok</translation>
 	<translation text="Pb">petabity</translation>
 	<translation text="PB">petabajty</translation>
+	<translation text="psf">funty na stopę kwadratową</translation>
+	<translation text="psi">funty na cal kwadratowy</translation>
 	<translation text="ptUS">pinta (USA)</translation>
 	<translation text="ptUK">pinta (UK)</translation>
 	<translation text="qtUS">kwarty (USA)</translation>
