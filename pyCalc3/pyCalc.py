@@ -504,6 +504,26 @@ class DataConverter(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
+class VolumeConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("mm^3"),_("cm^3"),_("dm^3"),_("m^3"),_("km^3"),_("L"),_("μL"),_("mL"),_("cL"),_("dL"),_("daL"),_("hL"),_("bbl oil"),_("bblUS"),_("bblUK"),_("galUS"),_("galUK"),_("qtUS"),_("qtUK"),_("ptUS"),_("ptUK"),_("cup metric"),_("cupUS"),_("cupUK"),_("fl ozUS"),_("fl ozUK"),_("tablespoonUS"),_("tablespoonUK"),_("dessertspoonUS"),_("dessertspoonUK"),_("teaspoonUS"),_("teaspoonUK"),_("giUS"),_("giUK"),_("minimUS"),_("minimUK"),_("mi^3"),_("yd^3"),_("ft^3"),_("in^3"),_("dr")]
+		self.values = [Decimal(str(i)) for i in [0.000001, 0.001, 1, 1000, 1e+12, 1, 0.000001, 0.001, 0.01, 0.1, 10, 100, 158.987294928, 119.240471196, 163.65924, 3.785411784, 4.54609, 0.946352946, 1.1365225, 0.473176473, 0.56826125, 0.25, 0.236588236, 0.284130625, 0.02957353, 0.028413063, 0.014786765, 0.017758164, 0.009857843, 0.011838776, 0.004928922, 0.005919388, 0.118294118, 0.142065312, 0.000061612, 0.000059194, 4.168181825e+12, 764.554857984, 28.316846592, 0.016387064, 0.003696691]]
+		#self.values = [Decimal(str(i)) for i in [1000000, 1000, 1, 0.001, 1e-12, 1, 1000000, 1000, 100, 10, 0.1, 0.01, 0.006289811, 0.008386414, 0.006110257, 0.264172052, 0.219969248, 1.056688209, 0.879876993, 2.113376419, 1.759753986, 4, 4.226752838, 3.519507973, 33.814022702, 35.195079728, 67.628045404, 56.312127565, 101.442068106, 84.468191347, 202.884136211, 168.936382694, 8.453505675, 7.039015946, 16230.730896885, 16893.63826937, 2.399127586e-13, 0.001307951, 0.035314667, 61.023744095, 270.512181615]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.13"), text, units, units)
+		self.bind(self.convertVolume)
+		self.grid()
+
+	def convertVolume(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
 class pyCalc(Tools):
 	def __init__(self):
 		self.settingsTemplate = {
@@ -518,7 +538,7 @@ class pyCalc(Tools):
 				'autoUpdate': 'true'
 			}
 		}
-		self.version = "3.1.15"
+		self.version = "3.1.16"
 		self.languages = ['pl','en']
 		self.lang = "pl"
 		self.end = False
@@ -643,7 +663,8 @@ class pyCalc(Tools):
 			_("menu1.9"): "area",
 			_("menu1.10"): "energy",
 			_("menu1.11"): "weightAndMass",
-			_("menu1.12"): "data"
+			_("menu1.12"): "data",
+			_("menu1.13"): "volume"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -731,6 +752,8 @@ class pyCalc(Tools):
 			calc = WeightAndMassConverter(self.root)
 		elif(function == "data"):
 			calc = DataConverter(self.root)
+		elif(function == "volume"):
+			calc = VolumeConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):
