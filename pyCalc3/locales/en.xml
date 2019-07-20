@@ -4,6 +4,8 @@
     <translation text="16ns">hexa decimal</translation>
     <translation text="2ns">binary</translation>
     <translation text="8ns">octal</translation>
+	<translation text="^g">grad</translation>
+	<translation text="°">degree</translation>
 	<translation text="μL">microliter</translation>
 	<translation text="a">are</translation>
 	<translation text="ac">acre</translation>
@@ -146,6 +148,7 @@
 	<translation text="menu1.13">Volume</translation>
 	<translation text="menu1.14">Power</translation>
 	<translation text="menu1.15">Pressure</translation>
+	<translation text="menu1.16">Angle</translation>
     <translation text="menu2">Formulas</translation>
     <translation text="menu2.1">Area and perimeter of shapes</translation>
 	<translation text="menu2.2">Absolute value</translation>
@@ -180,6 +183,7 @@
 	<translation text="milliseconds">Milliseconds</translation>
 	<translation text="minimUS">minim (US)</translation>
 	<translation text="minimUK">minim (UK)</translation>
+	<translation text="minute">minute</translation>
 	<translation text="minutes">Minutes</translation>
 	<translation text="MJ">megajoule</translation>
 	<translation text="mL">milliliter</translation>
@@ -213,11 +217,13 @@
 	<translation text="ptUK">pint (UK)</translation>
 	<translation text="qtUS">quart (US)</translation>
 	<translation text="qtUK">quart (UK)</translation>
+	<translation text="rad">radian</translation>
     <translation text="radian">radians</translation>
     <translation text="ratio">Aspect Ratio:</translation>
     <translation text="rectangle">Rectangle</translation>
     <translation text="result">Result:</translation>
     <translation text="rhombus">Rhombus</translation>
+	<translation text="second">second</translation>
 	<translation text="seconds">Seconds</translation>
     <translation text="status01">Downloading exchange rate...</translation>
     <translation text="status02">Ready!</translation>

@@ -561,6 +561,25 @@ class PressureConverter(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
+class AngleConverter(StandardWindow, Tools):
+	def __init__(self, root):
+		units = [_("°"),_("rad"),_("^g"),_("minute"),_("second")]
+		self.values = [Decimal(str(i)) for i in [0.017453293, 1, 0.015707963, 0.000290888, 0.000004848]]
+		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
+		self.create(root, _("menu1.16"), text, units, units)
+		self.bind(self.convertAngle)
+		self.grid()
+
+	def convertAngle(self, value, unitIn, unitOut):
+		value = value.replace(',','.')
+		if(self.isNumber(value)):
+			value = Decimal(str(value))
+			value *= self.values[unitIn]
+			value /= self.values[unitOut]
+			self.result['text'] = self.normalizeFraction(value)
+		else:
+			messagebox.showerror(_("error"), _("err2"))
+
 class pyCalc(Tools):
 	def __init__(self):
 		self.settingsTemplate = {
@@ -703,7 +722,8 @@ class pyCalc(Tools):
 			_("menu1.12"): "data",
 			_("menu1.13"): "volume",
 			_("menu1.14"): "power",
-			_("menu1.15"): "pressure"
+			_("menu1.15"): "pressure",
+			_("menu1.16"): "angle"
 		}
 		for item in sorted(menuFunctionsItems.keys()):
 			menuFunctions.add_command(label=item, command=lambda func=menuFunctionsItems[item]: self.function(func))
@@ -797,6 +817,8 @@ class pyCalc(Tools):
 			calc = PowerConverter(self.root)
 		elif(function == "pressure"):
 			calc = PressureConverter(self.root)
+		elif(function == "angle"):
+			calc = AngleConverter(self.root)
  
 	def changeSettings(self, setting, value):
 		if(setting == 'resultPreview'):

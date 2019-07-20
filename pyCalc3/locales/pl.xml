@@ -4,6 +4,8 @@
     <translation text="16ns">szesnastkowy</translation>
     <translation text="2ns">dwójkowy</translation>
     <translation text="8ns">ósemkowy</translation>
+	<translation text="^g">grad</translation>
+	<translation text="°">stopnie</translation>
 	<translation text="μL">mikrolitr</translation>
 	<translation text="a">ar</translation>
 	<translation text="ac">akr</translation>
@@ -146,6 +148,7 @@
 	<translation text="menu1.13">Objętość</translation>
 	<translation text="menu1.14">Moc</translation>
 	<translation text="menu1.15">Ciśnienie</translation>
+	<translation text="menu1.16">Kąt</translation>
     <translation text="menu2">Wzory</translation>
     <translation text="menu2.1">Pola i obwody figur</translation>
 	<translation text="menu2.2">Wartość bezwzględna</translation>
@@ -180,6 +183,7 @@
 	<translation text="milliseconds">Milisekundy</translation>
 	<translation text="minimUS">półnuta (USA)</translation>
 	<translation text="minimUK">półnuta (UK)</translation>
+	<translation text="minute">minuty</translation>
 	<translation text="minutes">Minuty</translation>
 	<translation text="MJ">megadżul</translation>
 	<translation text="mL">mililitr</translation>
@@ -213,11 +217,13 @@
 	<translation text="ptUK">pinta (UK)</translation>
 	<translation text="qtUS">kwarty (USA)</translation>
 	<translation text="qtUK">kwarty (UK)</translation>
+	<translation text="rad">radiany</translation>
     <translation text="radian">radiany</translation>
     <translation text="ratio">Proporcje:</translation>
     <translation text="rectangle">Prostokąt</translation>
     <translation text="result">Wynik:</translation>
     <translation text="rhombus">Romb</translation>
+	<translation text="second">sekundy</translation>
 	<translation text="seconds">Sekundy</translation>
     <translation text="status01">Pobieranie kursu walut...</translation>
     <translation text="status02">Gotowe!</translation>
