@@ -16,6 +16,12 @@ pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Pol
 - Speed Converter
 - Energy Converter
 - Area Converter
+- Weight and Mass Converter
+- Data Converter
+- Volume Converter
+- Power Converter
+- Pressure Converter
+- Angle Converter
 - Math formulas
 ## Source
 ### Requirements
