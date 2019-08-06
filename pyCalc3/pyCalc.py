@@ -13,47 +13,27 @@ from bs4 import BeautifulSoup
 import threading
 import webbrowser
 from decimal import *
-import lang
+import python_lang as lang
 _ = lang.get
 
 lang.add("locales/pl.xml")
 lang.add("locales/en.xml")
 lang.select("pl")
 
-class Stack:
-	def __init__(self):
-		self.stack = []
-	
-	def push(self, item):
-		self.stack.append(item)
+def isNumber(str):
+	if(str.isdigit()):
+		return 1
+	else:
+		try:
+			float(str)
+			return 2
+		except ValueError:
+			return 0
 
-	def pop(self):
-		self.stack.pop(len(self.stack)-1)
-
-	def top(self):
-		return self.stack[len(self.stack)-1]
-
-	def size(self):
-		return len(self.stack)
-
-	def get(self):
-		return self.stack[::-1]
-
-class Tools:
-	def isNumber(self, str):
-		if(str.isdigit()):
-			return 1
-		else:
-			try:
-				float(str)
-				return 2
-			except ValueError:
-				return 0
-	
-	def normalizeFraction(self, d):
-		normalized = d.normalize()
-		sign, digit, exponent = normalized.as_tuple()
-		return normalized if exponent <= 0 else normalized.quantize(1)
+def normalizeFraction(d):
+	normalized = d.normalize()
+	sign, digit, exponent = normalized.as_tuple()
+	return normalized if exponent <= 0 else normalized.quantize(1)
 
 class StandardWindow:
 	def create(self, root, title, text, units1, units2):
@@ -111,7 +91,7 @@ class ImageViewer:
 		else:
 			messagebox.showerror(_("error"), _("err3"))
 
-class LengthCalculator(StandardWindow, Tools):
+class LengthCalculator(StandardWindow):
 	def __init__(self, root):
 		units = [_("millimeters"),_("centimeters"),_("decimeters"),_("meters"),_("kilometers"),_("inches"),_("foots"),_("yards"),_("miles"),_("nautical miles")]
 		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
@@ -122,15 +102,15 @@ class LengthCalculator(StandardWindow, Tools):
 
 	def convertLength(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(value)
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class TemperatureCalculator(StandardWindow, Tools):
+class TemperatureCalculator(StandardWindow):
 	def __init__(self, root):
 		units = [_("celsius"),_("fahrenheit"),_("kelvin")]
 		text = [_("value"),_("unit"),_("targetUnit"),_("result")]
@@ -140,7 +120,7 @@ class TemperatureCalculator(StandardWindow, Tools):
 
 	def convertTemperature(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(value)
 			if(unitIn != unitOut):
 				if(unitIn == 1):
@@ -151,7 +131,7 @@ class TemperatureCalculator(StandardWindow, Tools):
 					value = 32+Decimal('9')/5*value
 				elif(unitOut == 2):
 					value += Decimal('273.15')
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
@@ -164,30 +144,12 @@ class NumberSystemCalculator(StandardWindow):
 		self.grid()
 	
 	def convertNumberSystem(self, number, systemIn, systemOut):
-		if(systemIn == 0):
-			if(re.match(r'^[01]+$', number)):
-				number = int(number,2)
-			else:
-				messagebox.showerror(_("error"), _("err2"))
-				return
-		elif(systemIn == 1):
-			if(re.match(r'^[0-7]+$', number)):
-				number = int(number,8)
-			else:
-				messagebox.showerror(_("error"), _("err2"))
-				return
-		elif(systemIn == 2):
-			if(re.match(r'^[0-9]+$', number)):
-				number = int(number)
-			else:
-				messagebox.showerror(_("error"), _("err2"))
-				return
-		elif(systemIn == 3):
-			if(re.match(r'^[0-9a-fA-F]+$', number)):
-				number = int(number,16)
-			else:
-				messagebox.showerror(_("error"), _("err2"))
-				return
+		systems = [2, 8, 10, 16]
+		try:
+			number = int(number, systems[systemIn])
+		except:
+			messagebox.showerror(_("error"), _("err2"))
+			return
 		if(systemOut == 0):
 			self.result['text'] = str(bin(number))[2:]
 		elif(systemOut == 1):
@@ -197,7 +159,7 @@ class NumberSystemCalculator(StandardWindow):
 		elif(systemOut == 3):
 			self.result['text'] = str(hex(number))[2:]
 
-class TrigonometricFunctions(StandardWindow, Tools):
+class TrigonometricFunctions(StandardWindow):
 	def __init__(self, root):
 		text = [_("function"),_("value"),_("unit"),_("result")]
 		functions = ['sin','cos','tg','ctg']
@@ -208,7 +170,7 @@ class TrigonometricFunctions(StandardWindow, Tools):
 
 	def calcTrigonometricFunc(self, value, function, unit):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(value)
 			if(unit == 0):
 				value = math.radians(value)
@@ -224,7 +186,7 @@ class TrigonometricFunctions(StandardWindow, Tools):
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class ScreenSizeCalculator(Tools):
+class ScreenSizeCalculator():
 	def __init__(self, root):
 		self.root = root
 		self.ssActiveEntry = None
@@ -307,7 +269,7 @@ class ScreenSizeCalculator(Tools):
 		if(index != None):
 			ratio = list(map(Decimal, self.ratioCBox.get().split(':')))
 			if(index == 0):
-				if(self.isNumber(self.entry[0].get())):
+				if(isNumber(self.entry[0].get())):
 					result = self.calcScreenSizeDiagonal(Decimal(self.entry[0].get()), ratio)
 					for i in range(1,6):
 						self.entry[i].delete(0, END)
@@ -317,9 +279,9 @@ class ScreenSizeCalculator(Tools):
 					self.entry[4].insert(0, round(result[0]*Decimal(2.54),2))
 					self.entry[5].insert(0, round(result[1]*Decimal(2.54),2))
 			elif(index == 1):
-				if(self.isNumber(self.entry[1].get())):
+				if(isNumber(self.entry[1].get())):
 					result = self.calcScreenSizeWidth(Decimal(self.entry[1].get()), ratio)
-					for i in [0,2,3,4,5]:
+					for i in range(6):
 						self.entry[i].delete(0, END)
 					self.entry[0].insert(0, result[1])
 					self.entry[2].insert(0, result[0])
@@ -327,9 +289,9 @@ class ScreenSizeCalculator(Tools):
 					self.entry[4].insert(0, round(Decimal(self.entry[1].get())*Decimal(2.54),2))
 					self.entry[5].insert(0, round(result[0]*Decimal(2.54),2))
 			elif(index == 2):
-				if(self.isNumber(self.entry[2].get())):
+				if(isNumber(self.entry[2].get())):
 					result = self.calcScreenSizeHeight(Decimal(self.entry[2].get()), ratio)
-					for i in [0,1,3,4,5]:
+					for i in range(6):
 						self.entry[i].delete(0, END)
 					self.entry[0].insert(0, result[1])
 					self.entry[1].insert(0, result[0])
@@ -337,9 +299,9 @@ class ScreenSizeCalculator(Tools):
 					self.entry[4].insert(0, round(result[0]*Decimal(2.54),2))
 					self.entry[5].insert(0, round(Decimal(self.entry[2].get())*Decimal(2.54),2))
 			elif(index == 3):
-				if(self.isNumber(self.entry[3].get())):
+				if(isNumber(self.entry[3].get())):
 					result = self.calcScreenSizeDiagonal(Decimal(self.entry[3].get()), ratio)
-					for i in [0,1,2,4,5]:
+					for i in range(6):
 						self.entry[i].delete(0, END)
 					self.entry[0].insert(0, round(Decimal(self.entry[3].get())/Decimal(2.54),2))
 					self.entry[1].insert(0, round(result[0]/Decimal(2.54),2))
@@ -347,9 +309,9 @@ class ScreenSizeCalculator(Tools):
 					self.entry[4].insert(0, round(result[0],2))
 					self.entry[5].insert(0, round(result[1],2))
 			elif(index == 4):
-				if(self.isNumber(self.entry[4].get())):
+				if(isNumber(self.entry[4].get())):
 					result = self.calcScreenSizeWidth(Decimal(self.entry[4].get()), ratio)
-					for i in [0,1,2,3,5]:
+					for i in range(6):
 						self.entry[i].delete(0, END)
 					self.entry[0].insert(0, round(result[1]/Decimal(2.54),2))
 					self.entry[1].insert(0, round(Decimal(self.entry[4].get())/Decimal(2.54),2))
@@ -357,9 +319,9 @@ class ScreenSizeCalculator(Tools):
 					self.entry[3].insert(0, result[1])
 					self.entry[5].insert(0, result[0])
 			elif(index == 5):
-				if(self.isNumber(self.entry[5].get())):
+				if(isNumber(self.entry[5].get())):
 					result = self.calcScreenSizeHeight(Decimal(self.entry[5].get()), ratio)
-					for i in [0,1,2,3,4]:
+					for i in range(5):
 						self.entry[i].delete(0, END)
 					self.entry[0].insert(0, round(result[1]/Decimal(2.54),2))
 					self.entry[1].insert(0, round(result[0]/Decimal(2.54),2))
@@ -390,7 +352,7 @@ class CurrencyConverter(StandardWindow):
 			self.status["text"] = _("status02")
 			self.submit.config(state=NORMAL)
 
-class TimeConverter(StandardWindow, Tools):
+class TimeConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("nanoseconds"),_("microseconds"),_("milliseconds"),_("seconds"),_("minutes"),_("hours"),_("days"),_("weeks"),_("months"),_("years")]
 		self.values = [Decimal(str(i)) for i in [0.000000001, 0.000001, 0.001, 1, 60, 3600, 86400, 604800, 2592000, 31536000]]
@@ -401,15 +363,15 @@ class TimeConverter(StandardWindow, Tools):
 
 	def convertTime(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class SpeedConverter(StandardWindow, Tools):
+class SpeedConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("mm/s"),_("cm/s"),_("m/s"),_("km/s"),_("mm/min"),_("cm/min"),_("m/min"),_("km/min"),_("mm/h"),_("cm/h"),_("m/h"),_("km/h"),_("ft/s"),_("ft/min"),_("ft/h"),_("yd/s"),_("yd/min"),_("yd/h"),_("mi/s"),_("mi/min"),_("kn"),_("mach")]
 		self.values = [Decimal(str(i)) for i in [0.001, 0.01, 1, 1000, 1.66667E-5, 0.0001666667, 0.0166666667, 16.6666666667, 2.7777777777778E-7, 2.7777777777778E-6, 0.0002777778, 0.2777777778, 0.3048, 0.00508, 8.46667E-5, 0.9144, 0.01524, 0.000254, 1609.344, 26.8224, 0.5144444444, 295.0464000003]]
@@ -420,15 +382,15 @@ class SpeedConverter(StandardWindow, Tools):
 
 	def convertSpeed(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class AreaConverter(StandardWindow, Tools):
+class AreaConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("mm^2"),_("cm^2"),_("in^2"),_("dm^2"),_("ft^2"),_("yd^2"),_("m^2"),_("km^2"),_("a"),_("ac"),_("ha"),_("mile^2")]
 		self.values = [Decimal(str(i)) for i in [0.000001, 0.0001, 0.00064516, 0.01, 0.09290304, 0.83612736, 1, 1000000, 100, 4046.8564224, 10000, 2589988.110336]]
@@ -439,15 +401,15 @@ class AreaConverter(StandardWindow, Tools):
 
 	def convertArea(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class EnergyConverter(StandardWindow, Tools):
+class EnergyConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("GJ"),_("MJ"),_("kJ"),_("j"),_("cal"),_("kcal"),_("kWh"),_("Btu"),_("kGm"),_("eV"),_("MT")]
 		self.values = [Decimal(str(i)) for i in [1e+9, 1e+6, 1000, 1, 4.1868, 4187, 3.6e+6, 1055.06, 9.80665, 1.60218e-19, 4e+15]]
@@ -458,15 +420,15 @@ class EnergyConverter(StandardWindow, Tools):
 
 	def convertEnergy(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class WeightAndMassConverter(StandardWindow, Tools):
+class WeightAndMassConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("ct"),_("cg"),_("dag"),_("gr"),_("g"),_("cwt"),_("cwtUK"),_("kg"),_("mg"),_("oz"),_("lb"),_("stone"),_("tonUS"),_("tonUK")]
 		self.values = [Decimal(str(i)) for i in [0.0002, 0.00001, 0.01, 0.00006479891, 0.001, 45.359237, 50.80234544, 1, 0.000001, 0.028349523125, 0.45359237, 6.35029318, 907.18474, 1016.0469088]]
@@ -477,15 +439,15 @@ class WeightAndMassConverter(StandardWindow, Tools):
 
 	def convertWeightAndMass(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class DataConverter(StandardWindow, Tools):
+class DataConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("b"),_("B"),_("Kb"),_("KB"),_("Mb"),_("MB"),_("Gb"),_("GB"),_("Tb"),_("TB"),_("Pb"),_("PB"),_("Eb"),_("EB")]
 		self.values = [Decimal(str(i)) for i in [0.125, 1, 125, 1000, 125000, 1000000, 125000000, 1000000000, 125000000000, 1000000000000, 125000000000000]]
@@ -496,15 +458,15 @@ class DataConverter(StandardWindow, Tools):
 
 	def convertData(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class VolumeConverter(StandardWindow, Tools):
+class VolumeConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("mm^3"),_("cm^3"),_("dm^3"),_("m^3"),_("km^3"),_("L"),_("μL"),_("mL"),_("cL"),_("dL"),_("daL"),_("hL"),_("bbl oil"),_("bblUS"),_("bblUK"),_("galUS"),_("galUK"),_("qtUS"),_("qtUK"),_("ptUS"),_("ptUK"),_("cup metric"),_("cupUS"),_("cupUK"),_("fl ozUS"),_("fl ozUK"),_("tablespoonUS"),_("tablespoonUK"),_("dessertspoonUS"),_("dessertspoonUK"),_("teaspoonUS"),_("teaspoonUK"),_("giUS"),_("giUK"),_("minimUS"),_("minimUK"),_("mi^3"),_("yd^3"),_("ft^3"),_("in^3"),_("dr")]
 		self.values = [Decimal(str(i)) for i in [0.000001, 0.001, 1, 1000, 1e+12, 1, 0.000001, 0.001, 0.01, 0.1, 10, 100, 158.987294928, 119.240471196, 163.65924, 3.785411784, 4.54609, 0.946352946, 1.1365225, 0.473176473, 0.56826125, 0.25, 0.236588236, 0.284130625, 0.02957353, 0.028413063, 0.014786765, 0.017758164, 0.009857843, 0.011838776, 0.004928922, 0.005919388, 0.118294118, 0.142065312, 0.000061612, 0.000059194, 4.168181825e+12, 764.554857984, 28.316846592, 0.016387064, 0.003696691]]
@@ -515,15 +477,15 @@ class VolumeConverter(StandardWindow, Tools):
 
 	def convertVolume(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class PowerConverter(StandardWindow, Tools):
+class PowerConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("W"),_("mW"),_("kW"),_("MW"),_("GW"),_("hp metric"),_("hp boiler"),_("hp electric"),_("hp water"),_("Btu/s"),_("Btu/min"),_("Btu/h"),_("kcal/s"),_("kcal/min"),_("kcal/h"),_("cal/s"),_("cal/min"),_("cal/h"),_("lbf*ft/s"),_("lbf*ft/min"),_("lbf*ft/h")]
 		self.values = [Decimal(str(i)) for i in [1, 0.001, 1000, 1000000, 1000000000, 735.49875, 9809.5, 746, 746.043, 1055.05585262, 17.58426421, 0.29307107, 4186.8, 69.78, 1.163, 4.1868, 0.06978, 0.001163, 1.355817948, 0.022596966, 0.000376616]]
@@ -534,15 +496,15 @@ class PowerConverter(StandardWindow, Tools):
 
 	def convertPower(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class PressureConverter(StandardWindow, Tools):
+class PressureConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("atm"),_("bar"),_("Pa"),_("kPa"),_("hPa"),_("mmHg"),_("psf"),_("psi"),_("kgf/cm^2"),_("kgf/m^2")]
 		self.values = [Decimal(str(i)) for i in [101325, 100000, 1, 1000, 100, 133.3223684211, 47.88020833333, 6894.75, 98066.5, 9.80665]]
@@ -553,15 +515,15 @@ class PressureConverter(StandardWindow, Tools):
 
 	def convertPressure(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class AngleConverter(StandardWindow, Tools):
+class AngleConverter(StandardWindow):
 	def __init__(self, root):
 		units = [_("°"),_("rad"),_("^g"),_("minute"),_("second")]
 		self.values = [Decimal(str(i)) for i in [0.017453293, 1, 0.015707963, 0.000290888, 0.000004848]]
@@ -572,15 +534,15 @@ class AngleConverter(StandardWindow, Tools):
 
 	def convertAngle(self, value, unitIn, unitOut):
 		value = value.replace(',','.')
-		if(self.isNumber(value)):
+		if(isNumber(value)):
 			value = Decimal(str(value))
 			value *= self.values[unitIn]
 			value /= self.values[unitOut]
-			self.result['text'] = self.normalizeFraction(value)
+			self.result['text'] = normalizeFraction(value)
 		else:
 			messagebox.showerror(_("error"), _("err2"))
 
-class pyCalc(Tools):
+class pyCalc():
 	def __init__(self):
 		self.settingsTemplate = {
 			'Personalization': {
@@ -976,7 +938,7 @@ class pyCalc(Tools):
 
 	def convertToRPN(self, text):
 		text = text.replace(',', '.')
-		stack = Stack()
+		stack = []
 		output = []
 		negative = False
 		brackets = []
@@ -999,79 +961,79 @@ class pyCalc(Tools):
 			elif(text[i] == '.'):
 				output[len(output)-1] += text[i]
 			elif(self.isFunction(text[i])):
-				stack.push(text[i])
+				stack.append(text[i])
 			elif(self.isOperator(text[i])):
 				if(text[i] == '-'):
 					if((i == 0) or (self.isOperator(text[i-1])) or text[i-1] == '(') and negative == False:
 						negative = True
 						continue
-				for j in range(stack.size()):
-					if(self.priority(text[i]) == 3 or self.priority(text[i]) > self.priority(stack.top())):
+				for j in range(len(stack)):
+					if(self.priority(text[i]) == 3 or self.priority(text[i]) > self.priority(stack[len(stack)-1])):
 						break
-					output.append(stack.top())
-					stack.pop()
-				stack.push(text[i])
+					output.append(stack[len(stack)-1])
+					stack.pop(len(stack)-1)
+				stack.append(text[i])
 			elif(text[i] == '('):
-				stack.push(text[i])
+				stack.append(text[i])
 				if(negative):
 					negative = False
 					brackets.append(True)
 				else:
 					brackets.append(False)
 			elif(text[i] == ')'):
-				while stack.top() != '(':
-					output.append(stack.top())
-					stack.pop()
-					if(stack.size() == 0):
+				while stack[len(stack)-1] != '(':
+					output.append(stack[len(stack)-1])
+					stack.pop(len(stack)-1)
+					if(len(stack) == 0):
 						return 0
-				stack.pop()
+				stack.pop(len(stack)-1)
 				brackets.pop()
-		output.extend(stack.get())
+		output.extend(stack[::-1])
 		return output
 
 	def calculateRPN(self, rpn):
 		if(rpn == 0):
 			return 0
-		stack = Stack()
+		stack = []
 		output = []
 		for c in rpn:
-			if(self.isNumber(c) == 1 or self.isNumber(c) == 2):
-				stack.push(Decimal(c))
+			if(isNumber(c) == 1 or isNumber(c) == 2):
+				stack.append(Decimal(c))
 			elif(self.isFunction(c)):
-				a = stack.top()
-				stack.pop()
+				a = stack[len(stack)-1]
+				stack.pop(len(stack)-1)
 				if(c == '%'):
-					stack.push(a/100)
+					stack.append(a/100)
 				elif(c == '‰'):
-					stack.push(a/1000)
+					stack.append(a/1000)
 			elif(self.isOperator(c)):
 				if(c == '√'):
-					a = stack.top()
-					stack.pop()
-					stack.push(a**Decimal('0.5'))
+					a = stack[len(stack)-1]
+					stack.pop(len(stack)-1)
+					stack.append(a**Decimal('0.5'))
 				else:
-					if(stack.size() > 1):
-						a = stack.top()
-						stack.pop()  
-						b = stack.top()
-						stack.pop()
+					if(len(stack) > 1):
+						a = stack[len(stack)-1]
+						stack.pop(len(stack)-1)  
+						b = stack[len(stack)-1]
+						stack.pop(len(stack)-1)
 						if(c == "+"):
-							stack.push(b+a)
+							stack.append(b+a)
 						elif(c == "-"):
-							stack.push(b-a)
+							stack.append(b-a)
 						elif(c == "*"):
-							stack.push(b*a)
+							stack.append(b*a)
 						elif(c == "/"):
 							if(a != 0):
-								stack.push(b/a)
+								stack.append(b/a)
 							else:
 								raise ZeroDivisionError
 						elif(c == "^"):
-							stack.push(b**a)
+							stack.append(b**a)
 					else:
 						return 0
-		return int(stack.top()) if float(stack.top()).is_integer() else stack.top()
-		#return self.normalizeFraction(stack.top())
+		return int(stack[len(stack)-1]) if float(stack[len(stack)-1]).is_integer() else stack[len(stack)-1]
+		#return normalizeFraction(stack[len(stack)-1])
 
 	def checkSettings(self):
 		path = os.path.join(os.getenv('LOCALAPPDATA'),'pyCalc')
@@ -1141,4 +1103,5 @@ class pyCalc(Tools):
 			btnOk = ttk.Button(buttons, text="OK", command=window.destroy)
 			btnOk.pack()
 
-calc = pyCalc()
+if __name__ == '__main__':
+	calc = pyCalc()
