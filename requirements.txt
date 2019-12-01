@@ -1,4 +1,4 @@
 beautifulsoup4==4.8.0
-Pillow==6.1.0
+Pillow==6.2.0
 python-lang==1.0.0
 soupsieve==1.9.2
