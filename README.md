@@ -24,7 +24,5 @@ pyCalc3 uses [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Pol
 - Angle Converter
 - Math formulas
 ## Source
-### Requirements
-- [python-lang](https://github.com/Programista3/python-lang)
 
-<br>Code tested in Windows 10 with Python 3.6.6
+Code tested in Windows 10 with Python 3.6.6
