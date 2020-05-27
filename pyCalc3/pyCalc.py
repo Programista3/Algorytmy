@@ -346,7 +346,7 @@ class CurrencyConverter(StandardWindow):
 		self.status["text"] = _("status01")
 		self.submit.config(state=DISABLED)
 		self.status.update_idletasks()
-		with urllib.urlopen("http://currencyconverterfree.000webhostapp.com/api/convert?from="+currencyIn+"&to="+currencyOut+"&value="+value) as url:
+		with urllib.urlopen("http://currencyconverter.grzegorzbabiarz.com/api/convert?from="+currencyIn+"&to="+currencyOut+"&value="+value) as url:
 			data = json.loads(url.read().decode())
 			self.result["text"] = data['value']
 			self.status["text"] = _("status02")
